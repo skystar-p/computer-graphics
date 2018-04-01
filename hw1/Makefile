@@ -6,3 +6,6 @@ run: all
 
 clean:
 	rm -f hw1.out
+
+handin:
+	tar czf	hw1.tar.gz *.cpp *.h Makefile report.pdf
