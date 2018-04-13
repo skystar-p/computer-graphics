@@ -2,15 +2,24 @@
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 #include "display.h"
+#include "camera.h"
+#include <cstdio>
 
 extern GLdouble rot, rot_sphere1, rot_sphere2;
 extern GLdouble rot_card;
 extern GLUquadricObj *obj;
 
+Camera camera(Vec(0.0, 0.0, 100.0));
+
+int left_mouse_button = 0;
+int right_mouse_button = 0;
+int last_x = 0, last_y = 0;
+
 int width, height;
-unsigned timeStep = 10;
+unsigned timestep = 10;
 
 void init() {
+    camera.translate(Vec(0.0, 0.0, 0.0));
     rot = 0.0;
     rot_sphere1 = 0.0;
     rot_sphere2 = 0.0;
@@ -69,7 +78,43 @@ void timer(int unused) {
     if (rot_card > 360.0) rot_card -= 360.0;
     rot_card += 1.0;
 
-    glutTimerFunc(timeStep, timer, 0);
+
+    glutTimerFunc(timestep, timer, 0);
+}
+
+void mouse_click(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        left_mouse_button = 1;
+        last_x = x; last_y = y;
+    }
+    else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+        left_mouse_button = 0;
+    }
+
+    if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
+        right_mouse_button = 1;
+        last_x = x; last_y = y;
+    }
+    else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP) {
+        right_mouse_button = 0;
+    }
+}
+
+void mouse_move(int x, int y) {
+    Vec first = camera.mouse_to_sphere(last_x, last_y, width, height);
+    Vec last = camera.mouse_to_sphere(x, y, width, height);
+
+    camera.rotate(first, last);
+    camera.lookat();
+}
+
+void register_callbacks() {
+    glutReshapeFunc(resize);
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
+    glutTimerFunc(timestep, timer, 0);
+    glutMouseFunc(mouse_click);
+    glutMotionFunc(mouse_move);
 }
 
 int main(int argc, char **argv) {
@@ -77,13 +122,9 @@ int main(int argc, char **argv) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 800);
     glutInitWindowPosition(50, 0);
-    glutCreateWindow("Homework 1");
+    glutCreateWindow("Homework 2");
 
-    // some functions
-    glutReshapeFunc(resize);
-    glutDisplayFunc(display);
-    glutKeyboardFunc(keyboard);
-    glutTimerFunc(timeStep, timer, 0);
+    register_callbacks();
     init();
 
     glutMainLoop();

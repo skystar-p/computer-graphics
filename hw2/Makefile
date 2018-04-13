@@ -1,5 +1,5 @@
 all:
-	g++ *.cpp -lGL -lGLU -lglut -o hw2.out
+	g++ --std=c++11 *.cpp -lGL -lGLU -lglut -o hw2.out
 
 run: all
 	./hw2.out

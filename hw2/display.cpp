@@ -3,23 +3,21 @@
 #include <GL/freeglut.h>
 #include <iostream>
 #include <cmath>
+#include "camera.h"
 
 GLdouble rot, rot_sphere1, rot_sphere2;
 GLdouble rot_card;
 GLUquadricObj *obj;
 
 int card_count = 10;
-
-float eye[3] = { 0.0, 0.0, 30.0 };
-float ori[3] = { 0.0, 0.0, 0.0 };
+extern Camera camera;
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(eye[0], eye[1], eye[2], ori[0], ori[1], ori[2], 0, 1, 0);
 
-    glTranslatef(0.0, 0.0, -60.0);
+    camera.lookat();
 
     glPushMatrix(); {
         glColor3f(1.0, 1.0, 1.0);
@@ -37,7 +35,8 @@ void display() {
         glRotatef(rot_card, 0.0, 1.0, 0.0);
         glRotatef(15.0, 0.0, 0.0, -1.0);
         for (int i = 0; i < card_count; i++) {
-            glRotatef(360.0 / card_count, 0.0, 1.0, 0.0); glBegin(GL_QUADS);
+            glRotatef(360.0 / card_count, 0.0, 1.0, 0.0);
+            glBegin(GL_QUADS);
                 glVertex3f(3.0, 5.0, -30);
                 glVertex3f(-3.0, 5.0, -30);
                 glVertex3f(-3.0, -5.0, -30);
