@@ -1,0 +1,11 @@
+all:
+	g++ *.cpp -lGL -lGLU -lglut -o hw2.out
+
+run: all
+	./hw2.out
+
+clean:
+	rm -f hw2.out
+
+handin:
+	tar czf	hw2.tar.gz *.cpp *.h Makefile report.pdf
