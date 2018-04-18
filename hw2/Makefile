@@ -7,5 +7,8 @@ run: all
 clean:
 	rm -f hw2.out
 
+report:
+	generate-md --input=report.md --output=report --layout=github
+
 handin:
 	tar czf	hw2.tar.gz *.cpp *.h Makefile report.pdf
