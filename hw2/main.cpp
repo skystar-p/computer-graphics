@@ -15,11 +15,12 @@ int left_mouse_button = 0;
 int right_mouse_button = 0;
 int last_x = 0, last_y = 0;
 
-int width, height;
+int width = 0, height = 0;
 unsigned timestep = 10;
 
+int zoom_mode = 0;
+
 void init() {
-    camera.translate(Vec(0.0, 0.0, 0.0));
     rot = 0.0;
     rot_sphere1 = 0.0;
     rot_sphere2 = 0.0;
@@ -57,6 +58,21 @@ void keyboard(unsigned char key, int x, int y) {
     case 27:
         exit(0);
         break;
+    case 'z':
+        if (zoom_mode == 0) {
+            zoom_mode = 1;
+            printf("Zoom mode\n");
+        }
+        break;
+    case 'x':
+        if (zoom_mode == 1) {
+            zoom_mode = 0;
+            printf("Dolly mode\n");
+        }
+        break;
+    case 's':
+        camera.show_all();
+        break;
     default:
         break;
     }
@@ -85,6 +101,7 @@ void timer(int unused) {
 void mouse_click(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         left_mouse_button = 1;
+        camera.update_vectors();
         last_x = x; last_y = y;
     }
     else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
@@ -93,19 +110,43 @@ void mouse_click(int button, int state, int x, int y) {
 
     if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
         right_mouse_button = 1;
+        camera.update_vectors();
         last_x = x; last_y = y;
     }
     else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP) {
         right_mouse_button = 0;
     }
+
+    if (zoom_mode == 0) {
+        if (button == 3 && state == GLUT_DOWN) {
+            camera.dolly(-10.0f);
+        }
+
+        if (button == 4 && state == GLUT_DOWN) {
+            camera.dolly(10.0f);
+        }
+    }
+    else {
+        if (button == 3 && state == GLUT_DOWN) {
+            camera.zoom(-3.0f);
+        }
+
+        if (button == 4 && state == GLUT_DOWN) {
+            camera.zoom(3.0f);
+        }
+    }
 }
 
 void mouse_move(int x, int y) {
-    Vec first = camera.mouse_to_sphere(last_x, last_y, width, height);
-    Vec last = camera.mouse_to_sphere(x, y, width, height);
+    if (left_mouse_button) {
+        Vec first = camera.to_sphere(last_x, last_y, width, height);
+        Vec last = camera.to_sphere(x, y, width, height);
 
-    camera.rotate(first, last);
-    camera.lookat();
+        camera.rotate(first, last);
+    }
+    else if (right_mouse_button) {
+        camera.translate(Vec(last_x - x, last_y - y, 0.0f));
+    }
 }
 
 void register_callbacks() {
