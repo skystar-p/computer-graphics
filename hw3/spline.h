@@ -2,7 +2,6 @@
 #define SPLINE_H
 
 #include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 // b-spline
@@ -58,7 +57,7 @@ glm::quat bezier_curve(glm::quat p0, glm::quat p1, glm::quat p2, glm::quat p3, f
 
 // catmull-rom interpolation
 template <typename T>
-T catmull_rom(T p0, T p3, T tgt0, T tgt3, float t) {
+T catmullrom_spline(T p0, T p3, T tgt0, T tgt3, float t) {
     // using hermite to bezier transform & affine invariance
     T p1 = (tgt0 / 3.0f) + p0;
     T p2 = -(tgt3 / 3.0f) + p3;
@@ -67,7 +66,7 @@ T catmull_rom(T p0, T p3, T tgt0, T tgt3, float t) {
 }
 
 template<>
-glm::quat catmull_rom(glm::quat p0, glm::quat p3, glm::quat tgt0, glm::quat tgt3, float t) {
+glm::quat catmullrom_spline(glm::quat p0, glm::quat p3, glm::quat tgt0, glm::quat tgt3, float t) {
     // using hermite to bezier transform & affine invariance
     glm::quat p1 = p0 * glm::exp(tgt0 / 3.0f);
     glm::quat p2 = p3 * glm::inverse(glm::exp(tgt3 / 3.0f));

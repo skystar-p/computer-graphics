@@ -1,0 +1,16 @@
+#ifndef SECTION_H
+#define SECTION_H
+
+#include <glm/glm.hpp>
+#include <vector>
+#include "spline_type.h"
+
+class Section {
+    public:
+        Section(std::vector<glm::vec3>, SplineType, float, glm::quat, glm::vec3);
+
+        std::vector<glm::vec3> points;
+        SplineType spline_type;
+};
+
+#endif

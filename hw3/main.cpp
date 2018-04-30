@@ -4,6 +4,8 @@
 #include "camera.h"
 
 
+int SPLINE_DIVISION = 10;
+
 int left_mouse_button = 0;
 int right_mouse_button = 0;
 int last_x = 0, last_y = 0;
