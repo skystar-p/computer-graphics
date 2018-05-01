@@ -120,6 +120,8 @@ int main(int argc, char **argv) {
 
     register_callbacks();
 
+    // read_from_file();
+
     glutMainLoop();
     return 0;
 }
