@@ -8,7 +8,9 @@
 
 class Surface {
     public:
+        Surface();
         Surface(std::vector<Section>, SplineType);
+
         std::vector<Section> sections;
         std::vector<glm::vec3> normals;
 };

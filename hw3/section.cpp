@@ -20,19 +20,21 @@ Section::Section(
     this->rotation = rotation;
     this->translate = translate;
 
+    std::vector<glm::vec3> transformed_control_points;
     for (auto point: control_points) {
         // follow the transformation order of file format
         point = point * scale;
         point = glm::vec3(glm::toMat4(rotation) * glm::vec4(point, 1.0f));
         point += translate;
+        transformed_control_points.push_back(point);
     }
 
-    int c = control_points.size();
+    int c = transformed_control_points.size();
 
-    for (unsigned i = 0; i < control_points.size(); i++) {
+    for (unsigned i = 0; i < transformed_control_points.size(); i++) {
         std::vector<glm::vec3> int_points;
         for (int ii = 0; ii < 4; ii++) {
-            int_points.push_back(control_points[(i + ii) % c]);
+            int_points.push_back(transformed_control_points[(i + ii) % c]);
         }
 
         if (spline_type == SplineType::CatmullRomSpline) {
@@ -59,6 +61,5 @@ Section::Section(
                 points.push_back(p);
             }
         }
-
     }
 }

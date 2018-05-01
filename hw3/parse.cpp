@@ -1,13 +1,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <iostream>
 #include <fstream>
 #include <vector>
 #include "parse.h"
 #include "spline_type.h"
 
 
+#include <cstdio>
 Surface read_from_file(std::string path) {
     std::ifstream fin(path, std::ios::in);
 
@@ -19,6 +19,7 @@ Surface read_from_file(std::string path) {
         spline_type = SplineType::BSpline;
     }
     else {
+        assert(spline_type_in == "CATMULL_ROM");
         spline_type = SplineType::CatmullRomSpline;
     }
 
@@ -27,23 +28,24 @@ Surface read_from_file(std::string path) {
 
     std::vector<Section> cross_sections;
     for (int i = 0; i < cross_section_count; i++) {
-        int x, y, z;
-        float scale, angle, rx, ry, rz;
-        int tx, ty, tz;
+        double x, y, z;
+        double scale, angle, rx, ry, rz;
+        double tx, ty, tz;
 
         std::vector<glm::vec3> control_points;
         for (int j = 0; j < control_point_count; j++) {
-            y = 0.0f;
+            y = 0.0;
             fin >> x >> z;
-            control_points.push_back(glm::vec3(x, y, z));
+            control_points.push_back(glm::vec3((float) x, (float) y, (float) z));
         }
         fin >> scale >> angle >> rx >> ry >> rz >> tx >> ty >> tz;
 
         glm::quat rotation(
-                glm::cos(angle / 2.0f),
-                rx * glm::sin(angle / 2.0f),
-                ry * glm::sin(angle / 2.0f),
-                rz * glm::sin(angle / 2.0f));
+                cos(angle / 2.0),
+                rx * sin(angle / 2.0),
+                ry * sin(angle / 2.0),
+                rz * sin(angle / 2.0));
+
         glm::vec3 translation(tx, ty, tz);
 
         cross_sections.push_back(Section(

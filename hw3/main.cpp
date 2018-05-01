@@ -2,6 +2,7 @@
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 #include <iostream>
+#include <cstdio>
 #include "camera.h"
 #include "parse.h"
 
@@ -14,8 +15,10 @@ int last_x = 0, last_y = 0;
 int zoom_mode = 0;
 
 int width = 0, height = 0;
+unsigned timestep = 10;
 
 Camera camera(Vec(0.0, 0.0, 100.0));
+Surface surface;
 
 void resize(int w, int h) {
     width = w;
@@ -98,20 +101,55 @@ void mouse_move(int x, int y) {
         Vec last = camera.to_sphere(x, y, width, height);
 
         camera.rotate(first, last);
+        camera.lookat();
     }
     else if (right_mouse_button) {
         camera.translate(Vec(last_x - x, last_y - y, 0.0f));
+        camera.lookat();
     }
 }
 
 void display() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
+    camera.lookat();
+
+    for (unsigned i = 0; i < surface.sections.size() - 1; i++) {
+        const unsigned c = surface.sections[i].points.size();
+        for (unsigned j = 0; j < c; j++) {
+            glm::vec3 v0 = surface.sections[i].points[j];
+            glm::vec3 v1 = surface.sections[i + 1].points[j];
+            glm::vec3 v2 = (j == c - 1) ?
+                surface.sections[i + 1].points[0] : surface.sections[i + 1].points[j + 1];
+            glm::vec3 v3 = (j == c - 1) ?
+                surface.sections[i].points[0] : surface.sections[i].points[j + 1];
+
+            glBegin(GL_QUADS);
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glVertex3f(v0.x, v0.y, v0.z);
+                glVertex3f(v1.x, v1.y, v1.z);
+                glVertex3f(v2.x, v2.y, v2.z);
+                glVertex3f(v3.x, v3.y, v3.z);
+            glEnd();
+        }
+    }
+
+    glutSwapBuffers();
+}
+
+void timer(int unused) {
+    glutPostRedisplay();
+    glutTimerFunc(timestep, timer, 0);
 }
 
 void register_callbacks() {
     glutReshapeFunc(resize);
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+    glutTimerFunc(timestep, timer, 0);
     glutMouseFunc(mouse_click);
     glutMotionFunc(mouse_move);
 }
@@ -125,9 +163,8 @@ int main(int argc, char **argv) {
 
     register_callbacks();
 
-    Surface surface = read_from_file("./sample.in");
+    surface = read_from_file("./sample.in");
 
-    // std::cout << surface.normals.size() << std::endl;
     glutMainLoop();
     return 0;
 }
