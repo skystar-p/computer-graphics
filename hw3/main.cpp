@@ -1,7 +1,9 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/freeglut.h>
+#include <iostream>
 #include "camera.h"
+#include "parse.h"
 
 
 int SPLINE_DIVISION = 10;
@@ -102,11 +104,14 @@ void mouse_move(int x, int y) {
     }
 }
 
+void display() {
+
+}
+
 void register_callbacks() {
     glutReshapeFunc(resize);
-    // glutDisplayFunc(display);
+    glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
-    // glutTimerFunc(timestep, timer, 0);
     glutMouseFunc(mouse_click);
     glutMotionFunc(mouse_move);
 }
@@ -120,8 +125,9 @@ int main(int argc, char **argv) {
 
     register_callbacks();
 
-    // read_from_file();
+    Surface surface = read_from_file("./sample.in");
 
+    // std::cout << surface.normals.size() << std::endl;
     glutMainLoop();
     return 0;
 }
