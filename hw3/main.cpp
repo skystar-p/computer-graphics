@@ -2,7 +2,7 @@
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 #include <iostream>
-#include <cstdio>
+#include <string>
 #include "camera.h"
 #include "parse.h"
 
@@ -163,7 +163,16 @@ int main(int argc, char **argv) {
 
     register_callbacks();
 
-    surface = read_from_file("./sample.in");
+    std::string path;
+
+    if (argc < 2) {
+        path = "sample.in";
+    }
+    else {
+        path = argv[1];
+    }
+
+    surface = read_from_file(path);
 
     glutMainLoop();
     return 0;

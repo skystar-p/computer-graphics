@@ -19,10 +19,14 @@ Section::Section(
     this->scale = scale;
     this->rotation = rotation;
     this->translate = translate;
+    this->points = control_points;
 
+}
+
+void Section::calculate() {
     std::vector<glm::vec3> transformed_control_points;
-    for (auto point: control_points) {
-        // follow the transformation order of file format
+    for (unsigned i = 0; i < points.size(); i++) {
+        glm::vec3 point = glm::vec3(points[i].x, points[i].y, points[i].z);
         point = point * scale;
         point = glm::vec3(glm::toMat4(rotation) * glm::vec4(point, 1.0f));
         point += translate;
@@ -30,6 +34,8 @@ Section::Section(
     }
 
     int c = transformed_control_points.size();
+
+    std::vector<glm::vec3> result;
 
     for (unsigned i = 0; i < transformed_control_points.size(); i++) {
         std::vector<glm::vec3> int_points;
@@ -46,7 +52,7 @@ Section::Section(
                         (int_points[2] - int_points[0]) / 2.0f,
                         (int_points[3] - int_points[1]) / 2.0f,
                         param);
-                points.push_back(p);
+                result.push_back(p);
             }
         }
         else { // b-spline
@@ -58,8 +64,10 @@ Section::Section(
                         int_points[2],
                         int_points[3],
                         param);
-                points.push_back(p);
+                result.push_back(p);
             }
         }
     }
+
+    points = result;
 }

@@ -59,5 +59,9 @@ Surface read_from_file(std::string path) {
     fin.close();
 
     Surface surface(cross_sections, spline_type);
+
+    for (int i = 0; i < surface.sections.size(); i++) {
+        surface.sections[i].calculate();
+    }
     return surface;
 }
