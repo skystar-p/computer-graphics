@@ -128,7 +128,11 @@ void display() {
                 surface.sections[i].points[0] : surface.sections[i].points[j + 1];
 
             glBegin(GL_QUADS);
-                glColor3f(1.0f, 1.0f, 1.0f);
+                if ((i % 2) ^ (j % 2)) {
+                    glColor3f(1.0f, 1.0f, 1.0f);
+                } else {
+                    glColor3f(0.8f, 0.8f, 0.8f);
+                }
                 glVertex3f(v0.x, v0.y, v0.z);
                 glVertex3f(v1.x, v1.y, v1.z);
                 glVertex3f(v2.x, v2.y, v2.z);
