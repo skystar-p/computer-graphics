@@ -11,4 +11,4 @@ report:
 	generate-md --input=report.md --output=report --layout=github
 
 handin:
-	tar czf	hw3.tar.gz *.cpp *.h Makefile report.pdf
+	tar czf	hw3.tar.gz *.cpp *.h Makefile report.pdf chess.in
