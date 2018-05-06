@@ -170,7 +170,7 @@ int main(int argc, char **argv) {
     std::string path;
 
     if (argc < 2) {
-        path = "sample.in";
+        path = "chess.in";
     }
     else {
         path = argv[1];

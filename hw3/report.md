@@ -23,11 +23,11 @@ make
     * 마우스 스크롤로 Zoom 또는 Dolly in, out을 할 수 있습니다.
     * 키보드 s키를 누르면 Show all가 됩니다.
 
-* filename이 지정되지 않으면 기본적으로 `sample.in`을 불러옵니다.
+* filename이 지정되지 않으면 기본적으로 `chess.in`을 불러옵니다.
 
 * File parsing을 구현했습니다.
 * 하나의 section에 대해서 B-spline과 Catmull-Rom spline으로 closed curve를 구성했습니다.
 * 각 section에 scale, rotation, translation을 적용하였습니다.
 * 각 factor들에 대한 spline들 또한 계산하고, 내부의 subsection들을 나누어서 interpolate 하였습니다.
 * 사각형을 이용해서 mesh를 구성했습니다.
-* 저의 개인 구현은 `sample.in`에 구현되어 있습니다.
+* 저의 개인 구현은 `chess.in`에 구현되어 있습니다.
