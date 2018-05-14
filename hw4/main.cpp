@@ -120,6 +120,13 @@ void display() {
 
     camera.lookat();
 
+    glBegin(GL_QUADS);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(7.5f, 0.0f, 0.0f);
+        glVertex3f(7.5f, 7.5f, 0.0f);
+        glVertex3f(0.0f, 7.5f, 0.0f);
+    glEnd();
+
     std::vector<std::vector<Polygon>> polygons;
 
     const unsigned ii = surface.sections.size() - 1;
@@ -138,9 +145,9 @@ void display() {
             glm::vec3 camera_vec = glm::vec3(camera_pos[0], camera_pos[1], camera_pos[2]);
             
             if (glm::dot(camera_vec, normal) > 0.0f) {
-                inner_polys.push_back(Polygon(v0, v1, v2, v3, normal, true));
+                inner_polys.push_back(Polygon(v0, v1, v2, v3, normal));
             } else {
-                inner_polys.push_back(Polygon(v0, v1, v2, v3, normal, false));
+                inner_polys.push_back(Polygon(v0, v1, v2, v3, normal));
             }
         }
         polygons.push_back(inner_polys);
@@ -174,20 +181,9 @@ void display() {
 
     for (auto& poly_vec : polygons) {
         for (auto& poly : poly_vec) {
-            if (!poly.is_front) {
-                poly.draw();
-            }
+            poly.draw();
         }
     }
-
-    for (auto& poly_vec : polygons) {
-        for (auto& poly : poly_vec) {
-            if (poly.is_front) {
-                poly.draw();
-            }
-        }
-    }
-    // std::sort(polygons.begin(), polygons.end());
 
     glutSwapBuffers();
 }
@@ -222,6 +218,13 @@ int main(int argc, char **argv) {
 
     // enable depth test
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_BUFFER_BIT);
+
+    // enable blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
     glShadeModel(GL_SMOOTH);
 
