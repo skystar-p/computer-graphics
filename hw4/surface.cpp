@@ -83,7 +83,7 @@ Surface::Surface(std::vector<Section> cross_sections, SplineType spline_type) {
         }
 
         // construct average normal vectors
-        for (unsigned i = 0; i < sections.size(); i++) {
+        for (unsigned i = 0; i < sections.size() - 1; i++) {
             unsigned c = sections[i].points.size();
             for (unsigned j = 0; j < c; j++) {
                 glm::vec3 v_left = (j == 0) ? sections[i].points[c - 1] : sections[i].points[j - 1];
@@ -91,7 +91,7 @@ Surface::Surface(std::vector<Section> cross_sections, SplineType spline_type) {
                 glm::vec3 v_up = (i == sections.size() - 1) ? sections[i].points[j] : sections[i + 1].points[j];
                 glm::vec3 v_down = (i == 0) ? sections[i].points[j] : sections[i - 1].points[j];
 
-                normals.push_back(glm::cross(v_right - v_left, v_up - v_down));
+                normals.push_back(glm::normalize(glm::cross(v_right - v_left, v_up - v_down)));
             }
         }
     }

@@ -6,6 +6,7 @@
 #include "camera.h"
 
 extern int width, height;
+extern GLfloat camera_pos[3];
 
 Vec::Vec(float x_, float y_, float z_) {
     x = x_; y = y_; z = z_;
@@ -119,6 +120,9 @@ void Camera::update_vectors() {
 }
 
 void Camera::lookat() {
+    camera_pos[0] = eye[0];
+    camera_pos[1] = eye[1];
+    camera_pos[2] = eye[1];
     gluLookAt(
         eye[0], eye[1], eye[2],
         center[0], center[1], center[2],

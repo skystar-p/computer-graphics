@@ -3,11 +3,13 @@
 #include <GL/freeglut.h>
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include "camera.h"
 #include "parse.h"
+#include "polygon.h"
 
 
-int SPLINE_DIVISION = 10;
+int SPLINE_DIVISION = 20;
 
 int left_mouse_button = 0;
 int right_mouse_button = 0;
@@ -18,6 +20,7 @@ int width = 0, height = 0;
 unsigned timestep = 10;
 
 Camera camera(Vec(0.0, 0.0, 100.0));
+GLfloat camera_pos[3] = { 0.0f, 0.0f, 100.0f };
 Surface surface;
 
 void resize(int w, int h) {
@@ -113,12 +116,16 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 
     camera.lookat();
 
-    for (unsigned i = 0; i < surface.sections.size() - 1; i++) {
+    std::vector<std::vector<Polygon>> polygons;
+
+    const unsigned ii = surface.sections.size() - 1;
+    for (unsigned i = 0; i < ii - 1; i++) {
         const unsigned c = surface.sections[i].points.size();
+        std::vector<Polygon> inner_polys;
         for (unsigned j = 0; j < c; j++) {
             glm::vec3 v0 = surface.sections[i].points[j];
             glm::vec3 v1 = surface.sections[i + 1].points[j];
@@ -127,19 +134,60 @@ void display() {
             glm::vec3 v3 = (j == c - 1) ?
                 surface.sections[i].points[0] : surface.sections[i].points[j + 1];
 
-            glBegin(GL_QUADS);
-                if ((i % 2) ^ (j % 2)) {
-                    glColor3f(1.0f, 1.0f, 1.0f);
-                } else {
-                    glColor3f(0.8f, 0.8f, 0.8f);
-                }
-                glVertex3f(v0.x, v0.y, v0.z);
-                glVertex3f(v1.x, v1.y, v1.z);
-                glVertex3f(v2.x, v2.y, v2.z);
-                glVertex3f(v3.x, v3.y, v3.z);
-            glEnd();
+            glm::vec3 normal = glm::normalize(glm::cross(v0 - v2, v1 - v3));
+            glm::vec3 camera_vec = glm::vec3(camera_pos[0], camera_pos[1], camera_pos[2]);
+            
+            if (glm::dot(camera_vec, normal) > 0.0f) {
+                inner_polys.push_back(Polygon(v0, v1, v2, v3, normal, true));
+            } else {
+                inner_polys.push_back(Polygon(v0, v1, v2, v3, normal, false));
+            }
+        }
+        polygons.push_back(inner_polys);
+    }
+
+    for (unsigned i = 0; i < ii - 1; i++) {
+        const unsigned c = surface.sections[i].points.size();
+        for (unsigned j = 0; j < c; j++) {
+            unsigned im = (i - 1) + (i == 0);
+            unsigned jm = (j + c - 1) % c;
+            glm::vec3 norm_up = polygons[i][j].normal;
+            glm::vec3 norm_down = polygons[im][jm].normal;
+            glm::vec3 norm_left = polygons[i][jm].normal;
+            glm::vec3 norm_right = polygons[im][j].normal;
+
+            polygons[i][j].new_normal = glm::normalize(norm_up + norm_down + norm_left + norm_right);
         }
     }
+
+    for (unsigned i = 0; i < ii - 1; i++) {
+        const unsigned c = surface.sections[i].points.size();
+        for (unsigned j = 0; j < c; j++) {
+            unsigned ip = (i + 1) - (i == ii - 2);
+            unsigned jp = (j + c + 1) % c;
+            polygons[i][j].normal = polygons[i][j].new_normal;
+            polygons[i][j].r_normal = polygons[ip][j].new_normal;
+            polygons[i][j].u_normal = polygons[i][jp].new_normal;
+            polygons[i][j].ru_normal = polygons[ip][jp].new_normal;
+        }
+    }
+
+    for (auto& poly_vec : polygons) {
+        for (auto& poly : poly_vec) {
+            if (!poly.is_front) {
+                poly.draw();
+            }
+        }
+    }
+
+    for (auto& poly_vec : polygons) {
+        for (auto& poly : poly_vec) {
+            if (poly.is_front) {
+                poly.draw();
+            }
+        }
+    }
+    // std::sort(polygons.begin(), polygons.end());
 
     glutSwapBuffers();
 }
@@ -164,6 +212,18 @@ int main(int argc, char **argv) {
     glutInitWindowSize(800, 800);
     glutInitWindowPosition(50, 0);
     glutCreateWindow("Homework 3");
+
+    // enable lighting
+    glEnable(GL_LIGHTING);
+
+    GLfloat light0_pos[] = { 0.0f, 50.0f, 200.0f, 0.0f };
+    glLightfv(GL_LIGHT0, GL_POSITION, light0_pos);
+    glEnable(GL_LIGHT0);
+
+    // enable depth test
+    glEnable(GL_DEPTH_TEST);
+
+    glShadeModel(GL_SMOOTH);
 
     register_callbacks();
 
