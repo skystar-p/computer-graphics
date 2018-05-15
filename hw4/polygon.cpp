@@ -18,7 +18,15 @@ Polygon::Polygon(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::ve
 
 void Polygon::draw() {
     glBegin(GL_QUADS);
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        float ambient_f[4] = {0.2f, 0.2f, 0.2f, 1.0f};
+        float diffuse_f[4] = {0.8f, 0.8f, 0.8f, 1.0f};
+        float specular_f[4] = {0.3f, 0.3f, 0.3f, 1.0f};
+
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_f);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_f);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, specular_f);
+        glMaterialf(GL_FRONT, GL_SHININESS, shininess);
+
         glNormal3f(normal.x, normal.y, normal.z);
         glVertex3f(points[0].x, points[0].y, points[0].z);
 
@@ -34,8 +42,17 @@ void Polygon::draw() {
 }
 
 void Polygon::draw_cube_face() {
+
     glBegin(GL_QUADS);
-        glColor4f(color[0], color[1], color[2], color[3]);
+        float ambient_f[4] = { ambient[0], ambient[1], ambient[2], ambient[3] };
+        float diffuse_f[4] = { diffuse[0], diffuse[1], diffuse[2], diffuse[3] };
+        float specular_f[4] = { specular[0], specular[1], specular[2], specular[3] };
+
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_f);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_f);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, specular_f);
+        glMaterialf(GL_FRONT, GL_SHININESS, shininess);
+
         glNormal3f(normal.x, normal.y, normal.z);
         glVertex3f(points[0].x, points[0].y, points[0].z);
         glVertex3f(points[1].x, points[1].y, points[1].z);

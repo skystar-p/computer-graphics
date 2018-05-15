@@ -206,12 +206,51 @@ void display() {
         cube_faces[i].translate(0.0f, 15.0f, 0.0f);
     }
 
+    /*
     cube_faces[0].color = glm::vec4(1.0f, 0.0f, 0.0f, 0.5f);
     cube_faces[1].color = glm::vec4(0.0f, 1.0f, 0.0f, 0.5f);
     cube_faces[2].color = glm::vec4(0.0f, 0.0f, 1.0f, 0.5f);
     cube_faces[3].color = glm::vec4(1.0f, 1.0f, 0.0f, 0.5f);
     cube_faces[4].color = glm::vec4(0.0f, 1.0f, 1.0f, 0.5f);
     cube_faces[5].color = glm::vec4(1.0f, 0.0f, 1.0f, 0.5f);
+    */
+
+    // http://www.it.hiof.no/~borres/j3d/explain/light/p-materials.html
+    // ruby
+    cube_faces[0].ambient = glm::vec4(0.1745f, 0.01175f, 0.01175f, 0.55f);
+    cube_faces[0].diffuse = glm::vec4(0.61424f, 0.04136f, 0.04136f, 0.55f);
+    cube_faces[0].specular = glm::vec4(0.727811f, 0.626959f, 0.626959f, 0.55f);
+    cube_faces[0].shininess = 76.8f;
+
+    // gold
+    cube_faces[1].ambient = glm::vec4(0.24725f, 0.1995f, 0.0745f, 0.5f);
+    cube_faces[1].diffuse = glm::vec4(0.75164f, 0.60648f, 0.22648f, 0.5f);
+    cube_faces[1].specular = glm::vec4(0.628281f, 0.555802f, 0.366065f, 0.5f);
+    cube_faces[1].shininess = 51.2f;
+
+    // silver
+    cube_faces[2].ambient = glm::vec4(0.19225f, 0.19225f, 0.19225f, 0.5f);
+    cube_faces[2].diffuse = glm::vec4(0.50754f, 0.50754f, 0.50754f, 0.5f);
+    cube_faces[2].specular = glm::vec4(0.508273f, 0.508273f, 0.508273f, 0.5f);
+    cube_faces[2].shininess = 51.2f;
+
+    // chrome
+    cube_faces[3].ambient = glm::vec4(0.25f, 0.25f, 0.25f, 0.5f);
+    cube_faces[3].diffuse = glm::vec4(0.4f, 0.4f, 0.4f, 0.5f);
+    cube_faces[3].specular = glm::vec4(0.774597f, 0.774597f, 0.774597f, 0.5f);
+    cube_faces[3].shininess = 76.8f;
+
+    // jade
+    cube_faces[4].ambient = glm::vec4(0.135f, 0.2225f, 0.1575f, 0.75f);
+    cube_faces[4].diffuse = glm::vec4(0.54f, 0.89f, 0.63f, 0.75f);
+    cube_faces[4].specular = glm::vec4(0.316228f, 0.316228f, 0.316228f, 0.75f);
+    cube_faces[4].shininess = 12.8f;
+
+    // brass
+    cube_faces[5].ambient = glm::vec4(0.329412f, 0.223529f, 0.027451f, 0.6f);
+    cube_faces[5].diffuse = glm::vec4(0.780392f, 0.568627f, 0.113725f, 0.6f);
+    cube_faces[5].specular = glm::vec4(0.992157f, 0.941176f, 0.807843f, 0.6f);
+    cube_faces[5].shininess = 27.8974f;
 
     std::sort(cube_faces.begin(), cube_faces.end());
 
@@ -244,6 +283,14 @@ void init() {
     glLightfv(GL_LIGHT0, GL_POSITION, light0_pos);
     glEnable(GL_LIGHT0);
 
+    GLfloat light1_pos[] = { 0.0f, -200.0f, 0.0f, 0.0f };
+    glLightfv(GL_LIGHT1, GL_POSITION, light1_pos);
+    glEnable(GL_LIGHT1);
+
+    GLfloat light2_pos[] = { 150.0f, 50.0f, 0.0f, 0.0f };
+    glLightfv(GL_LIGHT2, GL_POSITION, light2_pos);
+    glEnable(GL_LIGHT2);
+
     // enable depth test
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH_BUFFER_BIT);
@@ -251,8 +298,8 @@ void init() {
     // enable blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    // glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    // glEnable(GL_COLOR_MATERIAL);
 
     glShadeModel(GL_SMOOTH);
 }

@@ -28,7 +28,12 @@ class Polygon {
 
         glm::vec3 points[4];
         glm::vec3 normal, r_normal, ru_normal, u_normal, new_normal;
+
         glm::vec4 color;
+        glm::vec4 ambient;
+        glm::vec4 diffuse;
+        glm::vec4 specular;
+        float shininess;
 };
 
 #endif
