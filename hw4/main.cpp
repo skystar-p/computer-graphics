@@ -116,16 +116,9 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     camera.lookat();
-
-    glBegin(GL_QUADS);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(7.5f, 0.0f, 0.0f);
-        glVertex3f(7.5f, 7.5f, 0.0f);
-        glVertex3f(0.0f, 7.5f, 0.0f);
-    glEnd();
 
     std::vector<std::vector<Polygon>> polygons;
 
@@ -142,13 +135,8 @@ void display() {
                 surface.sections[i].points[0] : surface.sections[i].points[j + 1];
 
             glm::vec3 normal = glm::normalize(glm::cross(v0 - v2, v1 - v3));
-            glm::vec3 camera_vec = glm::vec3(camera_pos[0], camera_pos[1], camera_pos[2]);
             
-            if (glm::dot(camera_vec, normal) > 0.0f) {
-                inner_polys.push_back(Polygon(v0, v1, v2, v3, normal));
-            } else {
-                inner_polys.push_back(Polygon(v0, v1, v2, v3, normal));
-            }
+            inner_polys.push_back(Polygon(v0, v1, v2, v3, normal));
         }
         polygons.push_back(inner_polys);
     }
@@ -163,6 +151,7 @@ void display() {
             glm::vec3 norm_left = polygons[i][jm].normal;
             glm::vec3 norm_right = polygons[im][j].normal;
 
+            // new normal vector is average of four adjacent normal vectors
             polygons[i][j].new_normal = glm::normalize(norm_up + norm_down + norm_left + norm_right);
         }
     }
@@ -172,6 +161,7 @@ void display() {
         for (unsigned j = 0; j < c; j++) {
             unsigned ip = (i + 1) - (i == ii - 2);
             unsigned jp = (j + c + 1) % c;
+            // calculate normals
             polygons[i][j].normal = polygons[i][j].new_normal;
             polygons[i][j].r_normal = polygons[ip][j].new_normal;
             polygons[i][j].u_normal = polygons[i][jp].new_normal;
@@ -179,10 +169,54 @@ void display() {
         }
     }
 
-    for (auto& poly_vec : polygons) {
-        for (auto& poly : poly_vec) {
+    // draw all polygons
+    for (auto& poly_vec: polygons) {
+        for (auto& poly: poly_vec) {
             poly.draw();
         }
+    }
+
+    // draw translucent cube
+    glm::vec3 camera_vec = glm::vec3(camera_pos[0], camera_pos[1], camera_pos[2]);
+    glm::vec3 ver0 = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 ver1 = glm::vec3(7.5f, 0.0f, 0.0f);
+    glm::vec3 ver2 = glm::vec3(7.5f, 7.5f, 0.0f);
+    glm::vec3 ver3 = glm::vec3(0.0f, 7.5f, 0.0f);
+    glm::vec3 n = glm::vec3(0.0f, 0.0f, 1.0f);
+
+    std::vector<Polygon> cube_faces;
+    for (int i = 0; i < 6; i++) {
+        cube_faces.push_back(Polygon(ver0, ver1, ver2, ver3, n));
+    }
+
+    float pi = std::atan(1) * 4;
+    cube_faces[0].rotate(0.0f, 0.0f, 1.0f, 0.0f);
+    cube_faces[1].rotate(pi / 2, 0.0f, 1.0f, 0.0f);
+    cube_faces[1].translate(7.5f, 0.0f, 0.0f);
+    cube_faces[2].rotate(pi, 0.0f, 1.0f, 0.0f);
+    cube_faces[2].translate(7.5f, 0.0f, -7.5f);
+    cube_faces[3].rotate(pi / 2 * 3, 0.0f, 1.0f, 0.0f);
+    cube_faces[3].translate(0.0f, 0.0f, -7.5f);
+    cube_faces[4].rotate(pi / 2, -1.0f, 0.0f, 0.0f);
+    cube_faces[4].translate(0.0f, 7.5f, 0.0f);
+    cube_faces[5].rotate(pi / 2, 1.0f, 0.0f, 0.0f);
+    cube_faces[5].translate(0.0f, 0.0f, -7.5f);
+
+    for (int i = 0; i < 6; i++) {
+        cube_faces[i].translate(0.0f, 15.0f, 0.0f);
+    }
+
+    cube_faces[0].color = glm::vec4(1.0f, 0.0f, 0.0f, 0.5f);
+    cube_faces[1].color = glm::vec4(0.0f, 1.0f, 0.0f, 0.5f);
+    cube_faces[2].color = glm::vec4(0.0f, 0.0f, 1.0f, 0.5f);
+    cube_faces[3].color = glm::vec4(1.0f, 1.0f, 0.0f, 0.5f);
+    cube_faces[4].color = glm::vec4(0.0f, 1.0f, 1.0f, 0.5f);
+    cube_faces[5].color = glm::vec4(1.0f, 0.0f, 1.0f, 0.5f);
+
+    std::sort(cube_faces.begin(), cube_faces.end());
+
+    for (int i = 0; i < 6; i++) {
+        cube_faces[i].draw_cube_face();
     }
 
     glutSwapBuffers();
@@ -202,13 +236,7 @@ void register_callbacks() {
     glutMotionFunc(mouse_move);
 }
 
-int main(int argc, char **argv) {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(800, 800);
-    glutInitWindowPosition(50, 0);
-    glutCreateWindow("Homework 3");
-
+void init() {
     // enable lighting
     glEnable(GL_LIGHTING);
 
@@ -227,6 +255,16 @@ int main(int argc, char **argv) {
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
     glShadeModel(GL_SMOOTH);
+}
+
+int main(int argc, char **argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(800, 800);
+    glutInitWindowPosition(50, 0);
+    glutCreateWindow("Homework 3");
+
+    init();
 
     register_callbacks();
 
