@@ -206,15 +206,6 @@ void display() {
         cube_faces[i].translate(0.0f, 15.0f, 0.0f);
     }
 
-    /*
-    cube_faces[0].color = glm::vec4(1.0f, 0.0f, 0.0f, 0.5f);
-    cube_faces[1].color = glm::vec4(0.0f, 1.0f, 0.0f, 0.5f);
-    cube_faces[2].color = glm::vec4(0.0f, 0.0f, 1.0f, 0.5f);
-    cube_faces[3].color = glm::vec4(1.0f, 1.0f, 0.0f, 0.5f);
-    cube_faces[4].color = glm::vec4(0.0f, 1.0f, 1.0f, 0.5f);
-    cube_faces[5].color = glm::vec4(1.0f, 0.0f, 1.0f, 0.5f);
-    */
-
     // http://www.it.hiof.no/~borres/j3d/explain/light/p-materials.html
     // ruby
     cube_faces[0].ambient = glm::vec4(0.1745f, 0.01175f, 0.01175f, 0.55f);
@@ -241,9 +232,9 @@ void display() {
     cube_faces[3].shininess = 76.8f;
 
     // jade
-    cube_faces[4].ambient = glm::vec4(0.135f, 0.2225f, 0.1575f, 0.75f);
-    cube_faces[4].diffuse = glm::vec4(0.54f, 0.89f, 0.63f, 0.75f);
-    cube_faces[4].specular = glm::vec4(0.316228f, 0.316228f, 0.316228f, 0.75f);
+    cube_faces[4].ambient = glm::vec4(0.135f, 0.2225f, 0.1575f, 0.5f);
+    cube_faces[4].diffuse = glm::vec4(0.54f, 0.89f, 0.63f, 0.5f);
+    cube_faces[4].specular = glm::vec4(0.316228f, 0.316228f, 0.316228f, 0.5f);
     cube_faces[4].shininess = 12.8f;
 
     // brass
@@ -291,6 +282,10 @@ void init() {
     glLightfv(GL_LIGHT2, GL_POSITION, light2_pos);
     glEnable(GL_LIGHT2);
 
+    GLfloat light3_pos[] = { -150.0f, 50.0f, 0.0f, 0.0f };
+    glLightfv(GL_LIGHT3, GL_POSITION, light3_pos);
+    glEnable(GL_LIGHT3);
+
     // enable depth test
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH_BUFFER_BIT);
@@ -298,8 +293,6 @@ void init() {
     // enable blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    // glEnable(GL_COLOR_MATERIAL);
 
     glShadeModel(GL_SMOOTH);
 }

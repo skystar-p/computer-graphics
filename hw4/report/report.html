@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+    <title>컴퓨터 그래픽스 HW4 레포트</title>
+    <link type="text/css" rel="stylesheet" href="assets/css/github-markdown.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/pilcrow.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/hljs-github.min.css"/>
+  </head>
+  <body>
+    <article class="markdown-body"><h1 id="컴퓨터-그래픽스-hw4-레포트"><a class="header-link" href="#컴퓨터-그래픽스-hw4-레포트"></a>컴퓨터 그래픽스 HW4 레포트</h1>
+<blockquote>
+<p>2016-11076 박재현</p>
+</blockquote>
+<h2 id="환경"><a class="header-link" href="#환경"></a>환경</h2>
+<ul class="list">
+<li>Arch Linux 4.15.10-1-ARCH</li>
+<li>freeglut 3.0.0-2</li>
+<li>glm 0.9.8.5-2 (libglm-dev on Ubuntu)</li>
+</ul>
+<h2 id="실행하는-법"><a class="header-link" href="#실행하는-법"></a>실행하는 법</h2>
+<pre class="hljs"><code>make
+./hw4.<span class="hljs-keyword">out</span></code></pre><h2 id="구현-내용"><a class="header-link" href="#구현-내용"></a>구현 내용</h2>
+<ul class="list">
+<li><p>기본적으로 HW2의 3D viewer 기능이 있습니다.</p>
+<ul class="list">
+<li>마우스 왼쪽 클릭을 한 채로 움직이면 rotate가 됩니다.</li>
+<li>마우스 오른쪽 클릭을 한 채로 움직이면 translate가 됩니다.</li>
+<li>키보드 z키를 누르면 Zoom 모드가 됩니다.</li>
+<li>키보드 x키를 누르면 Dolly 모드가 됩니다.</li>
+<li>마우스 스크롤로 Zoom 또는 Dolly in, out을 할 수 있습니다.</li>
+<li>키보드 s키를 누르면 Show all가 됩니다.</li>
+</ul>
+</li>
+<li><p>체스 말은 불투명하게 렌더링 했습니다.</p>
+<ul class="list">
+<li>각 section들의 normal vector들을 평균을 내서 각 vertex에 주고, normal vector interpolation을 enable해서 부드러운 면을 렌더링 했습니다.</li>
+<li>면들의 material 또한 설정해줌으로서 빛을 잘 받아서 잘 그려지는 것을 확인했습니다.</li>
+</ul>
+</li>
+<li><p>반투명한 정육면체를 렌더링 했습니다.</p>
+<ul class="list">
+<li>Blend를 enable 함으로서 반투명한 면을 그릴 수 있게 하였습니다.</li>
+<li>각 면의 material들을 서로 다르게 결정해주었습니다. 각각 ruby, gold, silver, chrome, jade, brass를 나타내었습니다.</li>
+<li>각 material들의 ambient, diffuse, specular coefficients는 <code>http://www.it.hiof.no/~borres/j3d/explain/light/p-materials.html</code> 를 참고했습니다.</li>
+</ul>
+</li>
+<li><p>Depth Ordering을 구현했습니다.</p>
+<ul class="list">
+<li>반투명한 물체와 불투명한 물체의 겹친 모양을 잘 표현하기 위해서 직접 ordering을 구현했습니다.</li>
+<li>불투명한 물체를 먼저 그리고, 반투명한 물체는 거리를 계산해서 맨 뒤에 있는 면부터 그림으로서 적절한 view가 보이도록 만들었습니다.</li>
+</ul>
+</li>
+</ul>
+<pre class="hljs"><code><span class="hljs-comment">// comparator for polygon order</span>
+<span class="hljs-keyword">bool</span> <span class="hljs-keyword">operator</span>&lt; (<span class="hljs-keyword">const</span> Polygon&amp; p) {
+    glm::<span class="hljs-function">vec3 <span class="hljs-title">c</span><span class="hljs-params">(camera_pos[<span class="hljs-number">0</span>], camera_pos[<span class="hljs-number">1</span>], camera_pos[<span class="hljs-number">2</span>])</span></span>;
+    glm::vec3 my_center =
+        (points[<span class="hljs-number">0</span>] + points[<span class="hljs-number">1</span>] + points[<span class="hljs-number">2</span>] + points[<span class="hljs-number">3</span>]) / <span class="hljs-number">4.0f</span>;
+    glm::vec3 others_center =
+        (p.points[<span class="hljs-number">0</span>] + p.points[<span class="hljs-number">1</span>] + p.points[<span class="hljs-number">2</span>] + p.points[<span class="hljs-number">3</span>]) / <span class="hljs-number">4.0f</span>;
+
+    <span class="hljs-keyword">return</span> glm::length(my_center - c) &gt; glm::length(others_center - c);
+}
+
+<span class="hljs-comment">// hopefully we can use std::sort to sort the polygons</span>
+<span class="hljs-built_in">std</span>::sort(cube_faces.begin(), cube_faces.end());</code></pre><ul class="list">
+<li>Light source들을 여러 개 만들었습니다.<ul class="list">
+<li>OpenGL에서 제공하는 기본 Light source를 네 개를 directional light source로 만들었습니다.</li>
+<li>물체를 기준으로 보는 방향에 하나, 오른쪽에 하나, 왼쪽에 하나, 아래쪽에 하나를 두었습니다.</li>
+<li>Homework 2에 구현한 trackball로 여러 viewpoint에서 관찰할 수 있게 구현했습니다.</li>
+</ul>
+</li>
+</ul>
+    </article>
+  </body>
+</html>
