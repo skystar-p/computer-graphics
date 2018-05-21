@@ -19,6 +19,8 @@ int zoom_mode = 0;
 int width = 0, height = 0;
 unsigned timestep = 10;
 
+bool light_toggle[4] = { true, false, false, false };
+
 Camera camera(Vec(0.0, 0.0, 100.0));
 GLfloat camera_pos[3] = { 0.0f, 0.0f, 100.0f };
 Surface surface;
@@ -54,6 +56,22 @@ void keyboard(unsigned char key, int x, int y) {
     case 's':
         camera.show_all();
         break;
+
+    case '1':
+    case '2':
+    case '3':
+    case '4': {
+        int ind = key - '1';
+        light_toggle[ind] = !light_toggle[ind];
+        if (light_toggle[ind]) {
+            glEnable(GL_LIGHT0 + ind);
+            printf("Light %d on\n", ind);
+        } else {
+            glDisable(GL_LIGHT0 + ind);
+            printf("Light %d off\n", ind);
+        }
+        break;
+    }
     default:
         break;
     }
@@ -135,7 +153,7 @@ void display() {
                 surface.sections[i].points[0] : surface.sections[i].points[j + 1];
 
             glm::vec3 normal = glm::normalize(glm::cross(v0 - v2, v1 - v3));
-            
+
             inner_polys.push_back(Polygon(v0, v1, v2, v3, normal));
         }
         polygons.push_back(inner_polys);
@@ -269,6 +287,9 @@ void register_callbacks() {
 void init() {
     // enable lighting
     glEnable(GL_LIGHTING);
+    GLfloat light_ambient[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    GLfloat light_diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
     GLfloat light0_pos[] = { 0.0f, 50.0f, 200.0f, 0.0f };
     glLightfv(GL_LIGHT0, GL_POSITION, light0_pos);
@@ -276,15 +297,24 @@ void init() {
 
     GLfloat light1_pos[] = { 0.0f, -200.0f, 0.0f, 0.0f };
     glLightfv(GL_LIGHT1, GL_POSITION, light1_pos);
-    glEnable(GL_LIGHT1);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
+    // glEnable(GL_LIGHT1);
 
     GLfloat light2_pos[] = { 150.0f, 50.0f, 0.0f, 0.0f };
     glLightfv(GL_LIGHT2, GL_POSITION, light2_pos);
-    glEnable(GL_LIGHT2);
+    glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT2, GL_SPECULAR, light_specular);
+    // glEnable(GL_LIGHT2);
 
     GLfloat light3_pos[] = { -150.0f, 50.0f, 0.0f, 0.0f };
     glLightfv(GL_LIGHT3, GL_POSITION, light3_pos);
-    glEnable(GL_LIGHT3);
+    glLightfv(GL_LIGHT3, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT3, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT3, GL_SPECULAR, light_specular);
+    // glEnable(GL_LIGHT3);
 
     // enable depth test
     glEnable(GL_DEPTH_TEST);
