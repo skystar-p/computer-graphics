@@ -65,10 +65,10 @@ void keyboard(unsigned char key, int x, int y) {
         light_toggle[ind] = !light_toggle[ind];
         if (light_toggle[ind]) {
             glEnable(GL_LIGHT0 + ind);
-            printf("Light %d on\n", ind);
+            printf("Light %d on\n", ind + 1);
         } else {
             glDisable(GL_LIGHT0 + ind);
-            printf("Light %d off\n", ind);
+            printf("Light %d off\n", ind + 1);
         }
         break;
     }
