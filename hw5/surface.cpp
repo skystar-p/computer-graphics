@@ -5,44 +5,69 @@
 
 #define EPSILON 1e-5f
 
-
-Quad::Quad(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 d) {
+Triangle::Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
     points.push_back(a);
     points.push_back(b);
     points.push_back(c);
-    points.push_back(d);
 
-    vn = glm::normalize(glm::cross(a - c, b - d));
+    // is this right face?
+    vn = glm::normalize(glm::cross(a - b, b - c));
 }
 
-bool Quad::includes(glm::vec3 p) {
-    glm::vec3 sa = points[1] - points[0], sb = points[2] - points[1];
-    glm::vec3 sc = points[3] - points[2], sd = points[0] - points[3];
-    glm::vec3 ea = p - sa, eb = p - sb, ec = p - sc, ed = p - sd;
-    float fa = glm::cross(sa, ea);
+bool Triangle::includes(glm::vec3 p) {
+    // use barycentric coordinate
+    float area2 = glm::length(glm::cross(points[1] - points[0],
+                points[2] - points[0]));
 
-    // TODO
+    float a = glm::length(glm::cross(points[1] - p, points[2] - p)) / area2;
+    float b = glm::length(glm::cross(points[2] - p, points[0] - p)) / area2;
+    float c = 1 - a - b;
+
+    if (a >= 0 && a <= 1 && b >= 0 && b <= 1 && c >= 0 && c <= 1) {
+        return true;
+    }
+    return false;
 }
 
-bool Surface::has_intersection(Ray ray) {
-    glm::vec3 delta = center - ray.origin;
-    float t = glm::dot(delta, ray.direction);
-    float d = t * t - (glm::length(delta) - radius * radius);
-    if (d < EPSILON) {
+bool Triangle::has_intersection(Ray ray) {
+    float ln = glm::dot(ray.direction, vn);
+    if (ln < EPSILON) {
         return false;
     }
     return true;
 }
 
-glm::vec3 Surface::intersect(Ray ray) {
-    glm::vec3 delta = center - ray.origin;
-    float t = glm::dot(delta, ray.direction);
-    float d = t * t - (glm::length(delta) - radius * radius);
-    // use Sphere::has_intersection to verify validity of this section
-    float s = t - sqrtf(d);
+glm::vec3 Triangle::intersect(Ray ray) {
+    float ln = glm::dot(ray.direction, vn);
+    float d = glm::dot(points[0] - ray.origin, vn) / ln;
+    return ray.origin + ray.direction * d;
+}
 
-    // check if s is smaller than EPSILON?
-    return ray.origin + s * ray.direction;
+bool Surface::has_intersection(Ray ray) {
+    for (unsigned i = 0; i < triangles.size(); i++) {
+        if (triangles[i].has_intersection(ray)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+glm::vec3 Surface::intersect(Ray ray) {
+    bool first = false;
+    glm::vec3 min_intersect, intersection;
+
+    for (unsigned i = 0; i < triangles.size(); i++) {
+        if (triangles[i].has_intersection(ray)) {
+            intersection = triangles[i].intersect(ray);
+            float d = glm::length(ray.origin - intersection);
+            if (!first || glm::length(ray.origin - min_intersect) > d) {
+                min_intersect = intersection;
+                first = true;
+            }
+        }
+    }
+
+    return intersection;
 }
 
 Ray Surface::reflect(Ray ray) {
@@ -81,5 +106,13 @@ Ray Surface::refract(Ray ray) {
 }
 
 glm::vec3 Surface::normal(glm::vec3 point) {
-    return vn;
+    for (unsigned i = 0; i < triangles.size(); i++) {
+        if (triangles[i].includes(point)) {
+            return triangles[i].vn;
+        }
+    }
+
+    // this should not be happen
+    assert(false);
+    return glm::vec3(0);
 }

@@ -5,11 +5,13 @@
 #include <vector>
 #include "object.h"
 
-class Quad : Object {
+class Triangle : Object {
     public:
-        Quad(glm::vec3, glm::vec3, glm::vec3, glm::vec3);
+        Triangle(glm::vec3, glm::vec3, glm::vec3);
 
         bool includes(glm::vec3);
+        bool has_intersection(Ray);
+        glm::vec3 intersect(Ray);
 
         std::vector<glm::vec3> points;
         glm::vec3 vn;
@@ -23,7 +25,7 @@ class Surface : Object {
         glm::vec3 intersect(Ray);
         glm::vec3 normal(glm::vec3);
 
-        std::vector<Quad> quads;
+        std::vector<Triangle> triangles;
 };
 
 #endif

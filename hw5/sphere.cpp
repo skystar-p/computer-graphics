@@ -5,6 +5,7 @@
 
 #define EPSILON 1e-5f
 
+
 bool Sphere::has_intersection(Ray ray) {
     glm::vec3 delta = center - ray.origin;
     float t = glm::dot(delta, ray.direction);
