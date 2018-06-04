@@ -3,14 +3,31 @@
 #include "ray.h"
 #include <cmath>
 
+#include <cstdio>
+
 #define EPSILON 1e-5f
 
+
+Sphere::Sphere(glm::vec3 center, float radius, glm::vec3 ambient,
+        glm::vec3 diffuse, glm::vec3 specular, int gloss,
+        float n, bool is_reflective, bool is_refractive)
+    : Object(ambient, diffuse, specular, gloss, n,
+            is_reflective, is_refractive) {
+        this->center = center;
+        this->radius = radius;
+}
 
 bool Sphere::has_intersection(Ray ray) {
     glm::vec3 delta = center - ray.origin;
     float t = glm::dot(delta, ray.direction);
-    float d = t * t - (glm::length(delta) - radius * radius);
-    if (d < EPSILON) {
+    float l = glm::length(delta);
+    float d = t * t - (l * l - radius * radius);
+    if (d < EPSILON || std::isnan(d)) {
+        return false;
+    }
+
+    float s = t - sqrtf(d);
+    if (s < EPSILON) {
         return false;
     }
     return true;
@@ -19,7 +36,8 @@ bool Sphere::has_intersection(Ray ray) {
 glm::vec3 Sphere::intersect(Ray ray) {
     glm::vec3 delta = center - ray.origin;
     float t = glm::dot(delta, ray.direction);
-    float d = t * t - (glm::length(delta) - radius * radius);
+    float l = glm::length(delta);
+    float d = t * t - (l * l - radius * radius);
     // use Sphere::has_intersection to verify validity of this section
     float s = t - sqrtf(d);
 

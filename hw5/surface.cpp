@@ -5,7 +5,13 @@
 
 #define EPSILON 1e-5f
 
-Triangle::Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
+Triangle::Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c,
+        glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+        int gloss, float n, bool is_reflective,
+        bool is_refractive)
+    : Object(ambient, diffuse, specular, gloss, n,
+            is_reflective, is_refractive) {
+
     points.push_back(a);
     points.push_back(b);
     points.push_back(c);

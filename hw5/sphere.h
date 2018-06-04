@@ -6,8 +6,9 @@
 
 class Sphere : Object {
     public:
-        Sphere(glm::vec3, float);
-
+        Sphere(glm::vec3 center, float radius, glm::vec3 ambient,
+                glm::vec3 diffuse, glm::vec3 specular, int gloss,
+                float n, bool is_reflective, bool is_refractive);
         glm::vec3 center;
         float radius;
 

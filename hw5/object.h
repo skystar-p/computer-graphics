@@ -6,6 +6,12 @@
 
 class Object {
     public:
+        Object(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+                int gloss, float n, bool is_reflective,
+                bool is_refractive) :
+            gloss(gloss), is_reflective(is_reflective),
+            is_refractive(is_refractive), n(n),
+            ambient(ambient), diffuse(diffuse), specular(specular) {};
         virtual Ray reflect(Ray) = 0;
         virtual Ray refract(Ray) = 0;
         virtual bool has_intersection(Ray) = 0;
@@ -13,7 +19,10 @@ class Object {
         virtual glm::vec3 normal(glm::vec3) = 0;
 
         int gloss;
+        bool is_reflective, is_refractive;
+        float reflect_coeff = 0.1f, refract_coeff = 3.5f;
         float n;
+        glm::vec3 ambient, diffuse, specular;
 };
 
 #endif

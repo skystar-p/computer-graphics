@@ -1,5 +1,5 @@
 all:
-	g++ *.cpp -lGL -lGLU -lglut -o hw5.out
+	g++ *.cpp -lpng -lGL -lGLU -lglut -o hw5.out
 
 run: all
 	./hw5.out
