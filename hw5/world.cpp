@@ -6,7 +6,7 @@
 
 #include <cstdio>
 
-#define EPSILON 1e-2f
+#define EPSILON 1.0e-2f
 #define DEPTH_MAX 8
 
 extern glm::vec3 background;
@@ -40,11 +40,20 @@ glm::vec3 World::trace(Ray ray, int depth) {
     color += get_color(intersect_object, cv);
     total_coeff += 1.0f;
 
+    if (intersect_object == objects[0]) {
+        printf("COLOR %f %f %f\n", color.x, color.y, color.z);
+    }
+
     if (intersect_object->is_reflective) {
         float k = intersect_object->reflect_coeff;
         Ray reflect_ray = intersect_object->reflect(ray);
-        color += trace(reflect_ray, depth + 1) * k;
+        glm::vec3 temp = trace(reflect_ray, depth + 1);
+        color += temp * k;
         total_coeff += intersect_object->reflect_coeff;
+
+        if (objects[0]->has_intersection(reflect_ray)) {
+            //printf("color %f %f %f\n", temp.x, temp.y, temp.z);
+        }
     }
 
     if (intersect_object->is_refractive) {
@@ -83,7 +92,6 @@ glm::vec3 World::get_color(Object *object, glm::vec3 intersection) {
         }
     }
 
-    //printf("get_color: %f %f %f\n", color.x, color.y, color.z);
     return color;
 }
 
@@ -96,7 +104,7 @@ bool World::is_reachable(Light light, glm::vec3 point) {
         if (objects[i]->has_intersection(light_ray)) {
             float dist_from_light = glm::distance(light.position,
                     objects[i]->intersect(light_ray));
-            if (dist_from_light < d) {
+            if (dist_from_light - d < -EPSILON) {
                 return false;
             }
         }

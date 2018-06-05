@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <iostream>
 
-#define EPSILON 1e-2f
+#define EPSILON 1e-3f
 
 
 Sphere::Sphere(glm::vec3 center, float radius, glm::vec3 ambient,

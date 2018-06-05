@@ -57,16 +57,18 @@ Ray Triangle::refract(Ray ray) {
     return Ray(intersection, glm::normalize(t), n);
 }
 
+bool same_side(glm::vec3 p1, glm::vec3 p2, glm::vec3 a, glm::vec3 b) {
+    if (glm::dot(glm::cross(b - a, p1 - a), glm::cross(b - a, p2 - a)) >= 0) {
+        return true;
+    }
+    return false;
+}
+
 bool Triangle::includes(glm::vec3 p) {
-    // use barycentric coordinate
-    float area2 = glm::length(glm::cross(points[1] - points[0],
-                points[2] - points[0]));
-
-    float a = glm::length(glm::cross(points[1] - p, points[2] - p)) / area2;
-    float b = glm::length(glm::cross(points[2] - p, points[0] - p)) / area2;
-    float c = 1 - a - b;
-
-    if (a >= 0 && a <= 1 && b >= 0 && b <= 1 && c >= 0 && c <= 1) {
+    glm::vec3 &a = points[0];
+    glm::vec3 &b = points[1];
+    glm::vec3 &c = points[2];
+    if (same_side(p, a, b, c) && same_side(p, b, a, c) && same_side(p, c, a, b)) {
         return true;
     }
     return false;

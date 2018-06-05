@@ -12,62 +12,50 @@
 void write_image(std::vector<glm::vec3>);
 png_byte norm(float);
 
-static const float view_width = 360.0f, view_height = 200.0f;
-static const int width = 1800 / 5, height = 1000 / 5;
-const glm::vec3 eye_init(0.0f, 0.0f, 100.0f);
+static const float view_width = 720.0f, view_height = 400.0f;
+static const int width = 1800 / 3, height = 1000 / 3;
+const glm::vec3 eye_init(0.0f, 0.0f, 200.0f);
 glm::vec3 background(1.0f, 1.0f, 1.0f);
 
 int main() {
     World world;
 
     // lights
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 6; j++) {
-            Light light(glm::vec3(0.0f + 0.1f * i, 30.0f, 100.0f + 0.1f * j),
-                    20000.0f / 36.0f);
-            world.lights.push_back(light);
-        }
-    }
+    Light light1(glm::vec3(0.0f, 100.0f, 100.0f), 8000.0f);
+    Light light2(glm::vec3(0.0f, 100.0f, -200.0f), 8000.0f);
+    world.lights.push_back(light1);
+    world.lights.push_back(light2);
 
     Sphere sphere1(
-            glm::vec3(0.0f, 30.0f, 0.0f), 50.0f,
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(0.4f, 0.4f, 0.4f),
+            glm::vec3(0.0f, 20.0f, 0.0f), 50.0f,
+            glm::vec3(0.0f, 0.8f, 0.2f),
+            glm::vec3(0.3f, 0.3f, 0.3f),
             glm::vec3(0.2f, 0.2f, 0.2f),
             3, 1.5f, false, false);
-
-    Sphere sphere2(
-            glm::vec3(0.0f, 100.0f, -30.0f), 100.0f,
-            glm::vec3(1.0f, 0.0f, 0.0f),
-            glm::vec3(0.0f, 0.4f, 0.0f),
-            glm::vec3(0.2f, 0.2f, 0.2f),
-            3, 1.5f, true, false);
-
-    glm::vec3 test;
-    Ray r(glm::vec3(), glm::vec3(), 1.0f);
-    test = world.trace(r, 0);
 
     Triangle t1(
-            glm::vec3(-100.0f, -100.0f, 0.0f),
-            glm::vec3(100.0f, -100.0f, 0.0f),
-            glm::vec3(-100.0f, -100.0f, -100.0f),
+            glm::vec3(300.0f, 300.0f, 0.0f),
+            glm::vec3(300.0f, -300.0f, 0.0f),
+            glm::vec3(150.0f, -300.0f, -150.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
-            3, 1.5f, false, false);
+            3, 1.5f, true, false);
 
     Triangle t2(
-            glm::vec3(100.0f, -100.0f, -100.0f),
-            glm::vec3(-100.0f, -100.0f, -100.0f),
-            glm::vec3(100.0f, -100.0f, 0.0f),
+            glm::vec3(300.0f, 300.0f, 0.0f),
+            glm::vec3(150.0f, -300.0f, -150.0f),
+            glm::vec3(150.0f, 300.0f, -150.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
-            3, 1.5f, false, false);
+            3, 1.5f, true, false);
 
     world.objects.push_back((Object *)&sphere1);
-    //world.objects.push_back((Object *)&t1);
-    //world.objects.push_back((Object *)&t2);
+    world.objects.push_back((Object *)&t1);
+    world.objects.push_back((Object *)&t2);
+    ((Object *)&t1)->reflect_coeff = 100.0f;
+    ((Object *)&t2)->reflect_coeff = 100.0f;
 
     std::vector<glm::vec3> data;
     data = world.render(view_width, view_height, width, height);
