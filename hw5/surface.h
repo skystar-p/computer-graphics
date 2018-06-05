@@ -12,9 +12,12 @@ class Triangle : Object {
                 int gloss, float n, bool is_reflective,
                 bool is_refractive);
 
+        Ray reflect(Ray);
+        Ray refract(Ray);
         bool includes(glm::vec3);
         bool has_intersection(Ray);
         glm::vec3 intersect(Ray);
+        glm::vec3 normal(glm::vec3);
 
         std::vector<glm::vec3> points;
         glm::vec3 vn;

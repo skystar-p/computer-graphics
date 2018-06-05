@@ -4,8 +4,9 @@
 #include <cmath>
 
 #include <cstdio>
+#include <iostream>
 
-#define EPSILON 1e-5f
+#define EPSILON 1e-2f
 
 
 Sphere::Sphere(glm::vec3 center, float radius, glm::vec3 ambient,
@@ -27,7 +28,7 @@ bool Sphere::has_intersection(Ray ray) {
     }
 
     float s = t - sqrtf(d);
-    if (s < EPSILON) {
+    if (s < EPSILON || std::isnan(s)) {
         return false;
     }
     return true;
@@ -51,19 +52,22 @@ Ray Sphere::reflect(Ray ray) {
     glm::vec3 norm = normal(intersection);
     glm::vec3 l = -ray.direction;
 
+    float n = this->n;
+
     if (glm::dot(norm, l) < -EPSILON) {
         norm = -norm;
+        n = ray.n;
     }
 
-    glm::vec3 r = 2 * glm::dot(l, norm) * norm - l;
+    glm::vec3 r = 2.0f * glm::dot(l, norm) * norm - l;
 
-    return Ray(intersection, r, ray.n);
+    return Ray(intersection, glm::normalize(r), ray.n);
 }
 
 Ray Sphere::refract(Ray ray) {
     glm::vec3 intersection = intersect(ray);
     glm::vec3 norm = normal(intersection);
-    glm::vec3 l = -ray.direction;
+    glm::vec3 l = -glm::normalize(ray.direction);
 
     float n = this->n;
 
@@ -74,7 +78,7 @@ Ray Sphere::refract(Ray ray) {
 
     float cos_i = glm::dot(l, norm);
     float cos_r =
-        sqrt(1.0f - (ray.n / n) * (ray.n / n) * (1.0f - cos_i * cos_i));
+        sqrtf(1.0f - (ray.n / n) * (ray.n / n) * (1.0f - cos_i * cos_i));
     glm::vec3 t = ((ray.n / n) * cos_i - cos_r) * norm - (ray.n / n) * l;
 
     return Ray(intersection, glm::normalize(t), n);

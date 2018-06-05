@@ -6,10 +6,10 @@
 
 #include <cstdio>
 
-#define EPSILON 1e-5
+#define EPSILON 1e-2f
 #define DEPTH_MAX 8
 
-static glm::vec3 background = glm::vec3(255.0f, 255.0f, 255.0f);
+extern glm::vec3 background;
 
 glm::vec3 World::trace(Ray ray, int depth) {
     if (depth > DEPTH_MAX) {
@@ -17,7 +17,7 @@ glm::vec3 World::trace(Ray ray, int depth) {
     }
 
     glm::vec3 color;
-    float total_coeff = 0.f;
+    float total_coeff = 0.0f;
     glm::vec3 cv = glm::vec3(INFINITY);
     Object *intersect_object = NULL;
 
@@ -26,7 +26,6 @@ glm::vec3 World::trace(Ray ray, int depth) {
         if (objects[i]->has_intersection(ray)) {
             glm::vec3 inter = objects[i]->intersect(ray);
             float l = glm::distance(ray.origin, inter);
-            //printf("origin and inter dist: %f\n", l);
             if (glm::distance(ray.origin, cv) > l) {
                 cv = inter;
                 intersect_object = objects[i];
@@ -42,14 +41,16 @@ glm::vec3 World::trace(Ray ray, int depth) {
     total_coeff += 1.0f;
 
     if (intersect_object->is_reflective) {
+        float k = intersect_object->reflect_coeff;
         Ray reflect_ray = intersect_object->reflect(ray);
-        color += trace(reflect_ray, depth + 1);
+        color += trace(reflect_ray, depth + 1) * k;
         total_coeff += intersect_object->reflect_coeff;
     }
 
     if (intersect_object->is_refractive) {
+        float k = intersect_object->refract_coeff;
         Ray refract_ray = intersect_object->refract(ray);
-        color += trace(refract_ray, depth + 1);
+        color += trace(refract_ray, depth + 1) * k;
         total_coeff += intersect_object->refract_coeff;
     }
 
@@ -62,7 +63,7 @@ glm::vec3 World::get_color(Object *object, glm::vec3 intersection) {
     for (unsigned i = 0; i < lights.size(); i++) {
         if (is_reachable(lights[i], intersection)) {
             glm::vec3 n = object->normal(intersection);
-            glm::vec3 l = glm::normalize(intersection - lights[i].position);
+            glm::vec3 l = -glm::normalize(intersection - lights[i].position);
             glm::vec3 r = glm::dot(2.0f * l, n) * n - l;
             glm::vec3 v = glm::normalize(eye - intersection);
             float nl = glm::dot(n, l);
@@ -82,7 +83,8 @@ glm::vec3 World::get_color(Object *object, glm::vec3 intersection) {
         }
     }
 
-     return color;
+    //printf("get_color: %f %f %f\n", color.x, color.y, color.z);
+    return color;
 }
 
 bool World::is_reachable(Light light, glm::vec3 point) {
@@ -103,24 +105,33 @@ bool World::is_reachable(Light light, glm::vec3 point) {
     return true;
 }
 
-std::vector<glm::vec3> World::render(float width, float height, int out_width, int out_height) {
-    const glm::vec3 o(-width / 2.f, -height / 2.f, 0.0f);
+std::vector<glm::vec3> World::render(
+        float width, float height, int out_width, int out_height) {
+    const glm::vec3 o(-width / 2.f, height / 2.f, 0.0f);
 
     float width_r = width / (float) out_width;
     float height_r = height / (float) out_height;
 
     const glm::vec3 w(width_r, 0.0f, 0.0f);
-    const glm::vec3 h(0.0f, height_r, 0.0f);
+    const glm::vec3 h(0.0f, -height_r, 0.0f);
 
     std::vector<glm::vec3> data;
 
-    for (int i = 0; i < out_width; i++) {
-        for (int j = 0; j < out_height; j++) {
-            glm::vec3 project = glm::normalize(o + ((float) i * w) + ((float) j * h) - eye);
+    for (int j = 0; j < out_height; j++) {
+        for (int i = 0; i < out_width; i++) {
+            glm::vec3 summed(0.0f);
+            for (int dj = -1; dj <= 1; dj++) {
+                for (int di = -1; di <= 1; di++) {
+                    glm::vec3 project = glm::normalize(
+                            o + ((float) (i + di * 0.5f) * w) +
+                            ((float) (j + dj * 0.5f) * h) - eye);
 
-            Ray ray(eye, project, 1.0f);
-            glm::vec3 traced_result = trace(ray, 0);
-            data.push_back(traced_result);
+                    Ray ray(eye, project, 1.0f);
+                    glm::vec3 traced_result = trace(ray, 0);
+                    summed += traced_result;
+                }
+            }
+            data.push_back(summed / 9.0f);
         }
     }
 

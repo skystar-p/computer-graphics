@@ -5,7 +5,7 @@ run: all
 	./hw5.out
 
 clean:
-	rm -f hw5.out
+	rm -f hw5.out result.png
 
 handin:
 	tar czf	hw5.tar.gz *.cpp *.h Makefile report.pdf

@@ -3,6 +3,8 @@
 #include "ray.h"
 #include <cmath>
 
+#include <cstdio>
+
 #define EPSILON 1e-5f
 
 Triangle::Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c,
@@ -18,6 +20,41 @@ Triangle::Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c,
 
     // is this right face?
     vn = glm::normalize(glm::cross(a - b, b - c));
+}
+
+Ray Triangle::reflect(Ray ray) {
+    glm::vec3 intersection = intersect(ray);
+    glm::vec3 norm = normal(intersection);
+    glm::vec3 l = -ray.direction;
+
+    if (glm::dot(norm, l) < -EPSILON) {
+        norm = -norm;
+        n = ray.n;
+    }
+
+    glm::vec3 r = 2 * glm::dot(l, norm) * norm - l;
+
+    return Ray(intersection, r, ray.n);
+}
+
+Ray Triangle::refract(Ray ray) {
+    glm::vec3 intersection = intersect(ray);
+    glm::vec3 norm = normal(intersection);
+    glm::vec3 l = -ray.direction;
+
+    float n = this->n;
+
+    if (glm::dot(norm, l) < -EPSILON) {
+        norm = -norm;
+        n = ray.n;
+    }
+
+    float cos_i = glm::dot(l, norm);
+    float cos_r =
+        sqrt(1.0f - (ray.n / n) * (ray.n / n) * (1.0f - cos_i * cos_i));
+    glm::vec3 t = ((ray.n / n) * cos_i - cos_r) * norm - (ray.n / n) * l;
+
+    return Ray(intersection, glm::normalize(t), n);
 }
 
 bool Triangle::includes(glm::vec3 p) {
@@ -37,16 +74,20 @@ bool Triangle::includes(glm::vec3 p) {
 
 bool Triangle::has_intersection(Ray ray) {
     float ln = glm::dot(ray.direction, vn);
-    if (ln < EPSILON) {
-        return false;
-    }
-    return true;
+    float d = glm::dot(points[0] - ray.origin, vn) / ln;
+    glm::vec3 p = ray.origin + ray.direction * d;
+    return includes(p);
 }
 
 glm::vec3 Triangle::intersect(Ray ray) {
     float ln = glm::dot(ray.direction, vn);
     float d = glm::dot(points[0] - ray.origin, vn) / ln;
     return ray.origin + ray.direction * d;
+}
+
+glm::vec3 Triangle::normal(glm::vec3 p) {
+    if (!includes(p)) assert(false);
+    return vn;
 }
 
 bool Surface::has_intersection(Ray ray) {
@@ -84,6 +125,7 @@ Ray Surface::reflect(Ray ray) {
 
     if (glm::dot(norm, l) < -EPSILON) {
         norm = -norm;
+        n = ray.n;
     }
 
     glm::vec3 r = 2 * glm::dot(l, norm) * norm - l;

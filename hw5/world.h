@@ -6,6 +6,8 @@
 #include "ray.h"
 #include "object.h"
 
+extern const glm::vec3 eye_init;
+
 class Light {
     public:
         Light(glm::vec3 pos, float inten)
@@ -23,7 +25,7 @@ class World {
 
         std::vector<Light> lights;
         std::vector<Object *> objects;
-        const glm::vec3 eye = glm::vec3(0.0f, 0.0f, -50.0f);
+        const glm::vec3 eye = eye_init;
 };
 
 #endif

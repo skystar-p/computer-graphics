@@ -12,28 +12,66 @@
 void write_image(std::vector<glm::vec3>);
 png_byte norm(float);
 
-static const int width = 180, height = 100;
+static const float view_width = 360.0f, view_height = 200.0f;
+static const int width = 1800 / 5, height = 1000 / 5;
+const glm::vec3 eye_init(0.0f, 0.0f, 100.0f);
+glm::vec3 background(1.0f, 1.0f, 1.0f);
 
 int main() {
     World world;
-    Light light1(glm::vec3(0.0f, 50.0f, -30.0f), 0.5f);
+
+    // lights
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 6; j++) {
+            Light light(glm::vec3(0.0f + 0.1f * i, 30.0f, 100.0f + 0.1f * j),
+                    20000.0f / 36.0f);
+            world.lights.push_back(light);
+        }
+    }
+
     Sphere sphere1(
-            glm::vec3(0.0f, 0.0f, 30.0f), 10.0f,
-            glm::vec3(0.1f, 0.1f, 0.1f),
-            glm::vec3(0.2f, 0.3f, 0.4f),
-            glm::vec3(0.5f, 0.3f, 0.5f),
-            3, 0.7f, true, true);
+            glm::vec3(0.0f, 30.0f, 0.0f), 50.0f,
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.4f, 0.4f, 0.4f),
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            3, 1.5f, false, false);
+
+    Sphere sphere2(
+            glm::vec3(0.0f, 100.0f, -30.0f), 100.0f,
+            glm::vec3(1.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.4f, 0.0f),
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            3, 1.5f, true, false);
+
+    glm::vec3 test;
+    Ray r(glm::vec3(), glm::vec3(), 1.0f);
+    test = world.trace(r, 0);
+
+    Triangle t1(
+            glm::vec3(-100.0f, -100.0f, 0.0f),
+            glm::vec3(100.0f, -100.0f, 0.0f),
+            glm::vec3(-100.0f, -100.0f, -100.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            3, 1.5f, false, false);
+
+    Triangle t2(
+            glm::vec3(100.0f, -100.0f, -100.0f),
+            glm::vec3(-100.0f, -100.0f, -100.0f),
+            glm::vec3(100.0f, -100.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            3, 1.5f, false, false);
 
     world.objects.push_back((Object *)&sphere1);
-    world.lights.push_back(light1);
+    //world.objects.push_back((Object *)&t1);
+    //world.objects.push_back((Object *)&t2);
 
     std::vector<glm::vec3> data;
-    data = world.render(180.0f, 100.0f, width, height);
+    data = world.render(view_width, view_height, width, height);
 
-    // for (const auto &d: data) {
-    //     if (d.x < 250.0f)
-    //         printf("%f %f %f\n", d.x, d.y, d.z);
-    // }
     write_image(data);
 }
 
@@ -73,18 +111,17 @@ void write_image(std::vector<glm::vec3> data) {
         }
     }
 
-    printf("WOWO\n");
     for (int i = 0; i < height; i++) {
         png_write_row(png_struct, &image[i * width * 3]);
     }
 
     png_write_end(png_struct, NULL);
-    // png_write_info(png_struct, png_info);
 
     free(image);
 }
 
 png_byte norm(float v) {
+    v *= 255.0f;
     if (v < 0.0f) {
         return 0;
     }
