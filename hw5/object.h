@@ -20,8 +20,8 @@ class Object {
 
         int gloss;
         bool is_reflective, is_refractive;
-        float reflect_coeff = 0.1f, refract_coeff = 3.5f;
-        float n;
+        float reflect_coeff = 1.0f, refract_coeff = 1.0f;
+        const float n;
         glm::vec3 ambient, diffuse, specular;
 };
 

@@ -5,7 +5,7 @@
 
 #include <cstdio>
 
-#define EPSILON 1e-5f
+#define EPSILON 1e-2f
 
 Triangle::Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c,
         glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
@@ -27,14 +27,15 @@ Ray Triangle::reflect(Ray ray) {
     glm::vec3 norm = normal(intersection);
     glm::vec3 l = -ray.direction;
 
+    float n = this->n;
     if (glm::dot(norm, l) < -EPSILON) {
         norm = -norm;
         n = ray.n;
     }
 
-    glm::vec3 r = 2 * glm::dot(l, norm) * norm - l;
+    glm::vec3 r = glm::dot(l * 2.0f, norm) * norm - l;
 
-    return Ray(intersection, r, ray.n);
+    return Ray(intersection + r * EPSILON, r, ray.n);
 }
 
 Ray Triangle::refract(Ray ray) {
@@ -77,6 +78,9 @@ bool Triangle::includes(glm::vec3 p) {
 bool Triangle::has_intersection(Ray ray) {
     float ln = glm::dot(ray.direction, vn);
     float d = glm::dot(points[0] - ray.origin, vn) / ln;
+    if (d < EPSILON) {
+        return false;
+    }
     glm::vec3 p = ray.origin + ray.direction * d;
     return includes(p);
 }
@@ -125,6 +129,7 @@ Ray Surface::reflect(Ray ray) {
     glm::vec3 norm = normal(intersection);
     glm::vec3 l = -ray.direction;
 
+    float n = this->n;
     if (glm::dot(norm, l) < -EPSILON) {
         norm = -norm;
         n = ray.n;

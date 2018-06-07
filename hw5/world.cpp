@@ -2,12 +2,13 @@
 #include <cmath>
 #include <vector>
 #include "world.h"
+#include "sphere.h"
 #include "object.h"
 
 #include <cstdio>
 
-#define EPSILON 1.0e-2f
-#define DEPTH_MAX 8
+#define EPSILON 1e-2f
+#define DEPTH_MAX 20
 
 extern glm::vec3 background;
 
@@ -40,20 +41,11 @@ glm::vec3 World::trace(Ray ray, int depth) {
     color += get_color(intersect_object, cv);
     total_coeff += 1.0f;
 
-    if (intersect_object == objects[0]) {
-        printf("COLOR %f %f %f\n", color.x, color.y, color.z);
-    }
-
     if (intersect_object->is_reflective) {
         float k = intersect_object->reflect_coeff;
         Ray reflect_ray = intersect_object->reflect(ray);
-        glm::vec3 temp = trace(reflect_ray, depth + 1);
-        color += temp * k;
+        color += trace(reflect_ray, depth + 1) * k;
         total_coeff += intersect_object->reflect_coeff;
-
-        if (objects[0]->has_intersection(reflect_ray)) {
-            //printf("color %f %f %f\n", temp.x, temp.y, temp.z);
-        }
     }
 
     if (intersect_object->is_refractive) {

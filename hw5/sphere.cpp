@@ -68,6 +68,7 @@ Ray Sphere::refract(Ray ray) {
     glm::vec3 intersection = intersect(ray);
     glm::vec3 norm = normal(intersection);
     glm::vec3 l = -glm::normalize(ray.direction);
+    // return Ray(intersection + EPSILON * ray.direction, ray.direction, n);
 
     float n = this->n;
 
