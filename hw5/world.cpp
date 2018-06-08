@@ -116,9 +116,16 @@ std::vector<glm::vec3> World::render(
     const glm::vec3 h(0.0f, -height_r, 0.0f);
 
     std::vector<glm::vec3> data;
+    int progress = -1, prev_progress = 0;
 
     for (int j = 0; j < out_height; j++) {
         for (int i = 0; i < out_width; i++) {
+            prev_progress = (j * out_width + i) * 1000 / (out_width * out_height - 1);
+            if (progress != prev_progress) {
+                progress = prev_progress;
+                printf("\r%d/1000 completed...", progress);
+                fflush(stdout);
+            }
             glm::vec3 summed(0.0f);
             for (int dj = -1; dj <= 1; dj++) {
                 for (int di = -1; di <= 1; di++) {
@@ -134,6 +141,7 @@ std::vector<glm::vec3> World::render(
             data.push_back(summed / 9.0f);
         }
     }
+    printf("\n");
 
     return data;
 }

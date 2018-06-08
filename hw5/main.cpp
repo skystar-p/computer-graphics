@@ -40,6 +40,18 @@ int main() {
             glm::vec3(0.7f, 0.7f, 0.7f),
             3, 1.03f, true, true);
 
+    /*
+    for (int i = 0; i < 100; i++) {
+        Sphere* s = new Sphere(
+            glm::vec3((float)(std::rand() % 25) - 12.0f, 105.0f + (float)(std::rand() % 25), 60.0f), 0.3f,
+            glm::vec3(0.8f, 0.8f, 0.8f),
+            glm::vec3(0.4f, 0.4f, 0.4f),
+            glm::vec3(0.9f, 0.9f, 0.9f),
+            3, 1.03f, true, false);
+        world.objects.push_back((Object *)s);
+    }
+    */
+
     ((Object *)&sphere2)->reflect_coeff = 1.5f;
     ((Object *)&sphere2)->refract_coeff = 0.4f;
 
