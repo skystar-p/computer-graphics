@@ -139,9 +139,9 @@ Ray Surface::reflect(Ray ray) {
         n = ray.n;
     }
 
-    glm::vec3 r = 2 * glm::dot(l, norm) * norm - l;
+    glm::vec3 r = glm::dot(l * 2.0f, norm) * norm - l;
 
-    return Ray(intersection, r, ray.n);
+    return Ray(intersection + r * EPSILON, r, ray.n);
 }
 
 Ray Surface::refract(Ray ray) {
@@ -180,4 +180,20 @@ glm::vec3 Surface::get_texture_pixel(glm::vec3 p) {
     // never use this
     assert(false);
     return p;
+}
+
+void Surface::translate(glm::vec3 displacement) {
+    for (unsigned i = 0; i < triangles.size(); i++) {
+        for (int j = 0; j < 3; j++) {
+            triangles[i].points[j] += displacement;
+        }
+    }
+}
+
+void Surface::scale(float s) {
+    for (unsigned i = 0; i < triangles.size(); i++) {
+        for (int j = 0; j < 3; j++) {
+            triangles[i].points[j] *= s;
+        }
+    }
 }

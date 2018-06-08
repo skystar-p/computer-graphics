@@ -5,12 +5,12 @@
 #include "sphere.h"
 #include "surface.h"
 #include "image.h"
+#include "parse.h"
 
 #include <cstdio>
 
 #define CAST(x) ((Object *)(x))
 
-#define OUTPUT (char *)"./result.png"
 
 static const float view_width = 720.0f, view_height = 400.0f;
 static const int width = 1800 / 3, height = 1000 / 3;
@@ -48,53 +48,89 @@ int main() {
     (CAST(&sphere2))->reflect_coeff = 1.5f;
     (CAST(&sphere2))->refract_coeff = 0.4f;
 
-    Triangle t1(
+    Triangle mirror1(
             glm::vec3(0.0f, 200.0f, -200.0f),
             glm::vec3(0.0f, -200.0f, -200.0f),
-            glm::vec3(200.0f, -200.0f, 0.0f),
+            glm::vec3(400.0f, -200.0f, 0.0f),
             glm::vec3(0.3f, 0.3f, 0.3f),
             glm::vec3(0.4f, 0.4f, 0.4f),
             glm::vec3(0.3f, 0.3f, 0.3f),
-            3, 1.5f, true, false);
+            3, 1.0f, true, false);
 
-    Triangle t2(
-            glm::vec3(200.0f, -200.0f, 0.0f),
-            glm::vec3(200.0f, 200.0f, 0.0f),
+    Triangle mirror2(
+            glm::vec3(400.0f, -200.0f, 0.0f),
+            glm::vec3(400.0f, 200.0f, 0.0f),
             glm::vec3(0.0f, 200.0f, -200.0f),
             glm::vec3(0.3f, 0.3f, 0.3f),
             glm::vec3(0.4f, 0.4f, 0.4f),
             glm::vec3(0.3f, 0.3f, 0.3f),
-            3, 1.5f, true, false);
+            3, 1.0f, true, false);
+
+    Triangle mirror3(
+            glm::vec3(0.0f, 200.0f, -200.0f),
+            glm::vec3(0.0f, -200.0f, -200.0f),
+            glm::vec3(-400.0f, -200.0f, 0.0f),
+            glm::vec3(0.3f, 0.3f, 0.3f),
+            glm::vec3(0.4f, 0.4f, 0.4f),
+            glm::vec3(0.3f, 0.3f, 0.3f),
+            3, 1.0f, true, false);
+
+    Triangle mirror4(
+            glm::vec3(-400.0f, -200.0f, 0.0f),
+            glm::vec3(-400.0f, 200.0f, 0.0f),
+            glm::vec3(0.0f, 200.0f, -200.0f),
+            glm::vec3(0.3f, 0.3f, 0.3f),
+            glm::vec3(0.4f, 0.4f, 0.4f),
+            glm::vec3(0.3f, 0.3f, 0.3f),
+            3, 1.0f, true, false);
+
+    (CAST(&mirror1))->reflect_coeff = 1.0f;
+    (CAST(&mirror2))->reflect_coeff = 1.0f;
+    (CAST(&mirror3))->reflect_coeff = 1.0f;
+    (CAST(&mirror4))->reflect_coeff = 1.0f;
 
     Triangle floor1(
-            glm::vec3(200.0f, -70.0f, -200.0f),
-            glm::vec3(-200.0f, -70.0f, -200.0f),
-            glm::vec3(200.0f, -70.0f, 200.0f),
+            glm::vec3(400.0f, -70.0f, -400.0f),
+            glm::vec3(-400.0f, -70.0f, -400.0f),
+            glm::vec3(400.0f, -70.0f, 400.0f),
             glm::vec3(0.5f, 0.0f, 0.0f),
             glm::vec3(0.4f, 0.4f, 0.4f),
             glm::vec3(0.7f, 0.7f, 0.7f),
-            3, 1.5f, false, false);
+            3, 1.0f, false, false);
 
     Triangle floor2(
-            glm::vec3(-200.0f, -70.0f, -200.0f),
-            glm::vec3(-200.0f, -70.0f, 200.0f),
-            glm::vec3(200.0f, -70.0f, 200.0f),
+            glm::vec3(-400.0f, -70.0f, -400.0f),
+            glm::vec3(-400.0f, -70.0f, 400.0f),
+            glm::vec3(400.0f, -70.0f, 400.0f),
             glm::vec3(0.5f, 0.0f, 0.0f),
             glm::vec3(0.4f, 0.4f, 0.4f),
             glm::vec3(0.7f, 0.7f, 0.7f),
-            3, 1.5f, false, false);
+            3, 1.0f, false, false);
+
+    Surface surface(
+            glm::vec3(0.0f, 0.0f, 0.5f),
+            glm::vec3(0.3f, 0.3f, 0.3f),
+            glm::vec3(0.4f, 0.4f, 0.4f),
+            3, 1.0f, true, false);
+
+    load_obj(surface, (char *)"./assets/octahedron.obj");
+    surface.scale(30.0f);
+    surface.translate(glm::vec3(40.0f, -30.0f, 100.0f));
 
     world.objects.push_back(CAST(&sphere1));
     world.objects.push_back(CAST(&sphere2));
-    world.objects.push_back(CAST(&t1));
-    world.objects.push_back(CAST(&t2));
+    world.objects.push_back(CAST(&mirror1));
+    world.objects.push_back(CAST(&mirror2));
+    world.objects.push_back(CAST(&mirror3));
+    world.objects.push_back(CAST(&mirror4));
     world.objects.push_back(CAST(&floor1));
     world.objects.push_back(CAST(&floor2));
-    (CAST(&t1))->reflect_coeff = 1.0f;
-    (CAST(&t2))->reflect_coeff = 1.0f;
+    for (int i = 0; i < (int) surface.triangles.size(); i++) {
+        world.objects.push_back(CAST(&surface.triangles[i]));
+    }
 
     std::vector<glm::vec3> data;
     data = world.render(view_width, view_height, width, height);
 
-    write_image(data, width, height, OUTPUT);
+    write_image(data, width, height, (char *)"./result.png");
 }

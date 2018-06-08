@@ -26,12 +26,19 @@ class Triangle : Object {
 
 class Surface : Object {
     public:
+        Surface(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+                int gloss, float n, bool is_reflective,
+                bool is_refractive)
+            : Object(ambient, diffuse, specular, gloss, n,
+                    is_reflective, is_refractive) {};
         Ray reflect(Ray);
         Ray refract(Ray);
         bool has_intersection(Ray);
         glm::vec3 intersect(Ray);
         glm::vec3 normal(glm::vec3);
         glm::vec3 get_texture_pixel(glm::vec3);
+        void scale(float);
+        void translate(glm::vec3);
 
         std::vector<Triangle> triangles;
 };

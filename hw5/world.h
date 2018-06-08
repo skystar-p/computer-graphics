@@ -22,6 +22,7 @@ class World {
         glm::vec3 trace(Ray, int);
         glm::vec3 get_color(Object *, glm::vec3);
         bool is_reachable(Light, glm::vec3);
+        void add_light(Light &);
 
         std::vector<Light> lights;
         std::vector<Object *> objects;

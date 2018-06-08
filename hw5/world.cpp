@@ -10,7 +10,7 @@
 
 #define EPSILON 1e-2f
 #define DEPTH_MAX 20
-#define THREAD_COUNT 8
+#define THREAD_COUNT 16
 
 extern glm::vec3 background;
 
@@ -115,6 +115,10 @@ bool World::is_reachable(Light light, glm::vec3 point) {
     return true;
 }
 
+void World::add_light(Light & light) {
+    lights.push_back(light);
+}
+
 std::vector<glm::vec3> World::render(
         float width, float height, int out_width, int out_height) {
     pthread_t threads[THREAD_COUNT];
@@ -181,8 +185,8 @@ void *thread_func(void *thread_data) {
                 printf("Thread %d - %d/100 completed...\n", id, progress);
             }
             glm::vec3 summed(0.0f);
-            for (int dj = -1; dj <= 1; dj++) {
-                for (int di = -1; di <= 1; di++) {
+            for (int dj = -2; dj <= 2; dj++) {
+                for (int di = -2; di <= 2; di++) {
                     glm::vec3 project = glm::normalize(
                             o + ((float) (i + di * 0.5f) * w) +
                             ((float) (j + dj * 0.5f) * h) - eye);
@@ -192,7 +196,7 @@ void *thread_func(void *thread_data) {
                     summed += traced_result;
                 }
             }
-            data->push_back(summed / 9.0f);
+            data->push_back(summed / 25.0f);
         }
     }
 
