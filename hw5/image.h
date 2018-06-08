@@ -5,7 +5,13 @@
 #include <vector>
 #include <png.h>
 
+typedef struct image_info {
+    png_bytep *data;
+    int width;
+    int height;
+} image_info_t;
+
+image_info_t *read_image(char *);
 void write_image(std::vector<glm::vec3>, int, int, char *);
-png_byte norm(float);
 
 #endif

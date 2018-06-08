@@ -8,6 +8,8 @@
 
 #include <cstdio>
 
+#define CAST(x) ((Object *)(x))
+
 #define OUTPUT (char *)"./result.png"
 
 static const float view_width = 720.0f, view_height = 400.0f;
@@ -38,8 +40,8 @@ int main() {
             glm::vec3(0.7f, 0.7f, 0.7f),
             3, 1.03f, true, true);
 
-    ((Object *)&sphere2)->reflect_coeff = 1.5f;
-    ((Object *)&sphere2)->refract_coeff = 0.4f;
+    (CAST(&sphere2))->reflect_coeff = 1.5f;
+    (CAST(&sphere2))->refract_coeff = 0.4f;
 
     Triangle t1(
             glm::vec3(0.0f, 200.0f, -200.0f),
@@ -77,14 +79,14 @@ int main() {
             glm::vec3(0.7f, 0.7f, 0.7f),
             3, 1.5f, false, false);
 
-    world.objects.push_back((Object *)&sphere1);
-    world.objects.push_back((Object *)&sphere2);
-    world.objects.push_back((Object *)&t1);
-    world.objects.push_back((Object *)&t2);
-    world.objects.push_back((Object *)&floor1);
-    world.objects.push_back((Object *)&floor2);
-    ((Object *)&t1)->reflect_coeff = 1.0f;
-    ((Object *)&t2)->reflect_coeff = 1.0f;
+    world.objects.push_back(CAST(&sphere1));
+    world.objects.push_back(CAST(&sphere2));
+    world.objects.push_back(CAST(&t1));
+    world.objects.push_back(CAST(&t2));
+    world.objects.push_back(CAST(&floor1));
+    world.objects.push_back(CAST(&floor2));
+    (CAST(&t1))->reflect_coeff = 1.0f;
+    (CAST(&t2))->reflect_coeff = 1.0f;
 
     std::vector<glm::vec3> data;
     data = world.render(view_width, view_height, width, height);
