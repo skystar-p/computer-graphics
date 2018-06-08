@@ -13,7 +13,7 @@ void write_image(std::vector<glm::vec3>);
 png_byte norm(float);
 
 static const float view_width = 720.0f, view_height = 400.0f;
-static const int width = 1800, height = 1000;
+static const int width = 1800 / 5, height = 1000 / 5;
 const glm::vec3 eye_init(0.0f, 0.0f, 300.0f);
 glm::vec3 background(1.0f, 1.0f, 1.0f);
 
