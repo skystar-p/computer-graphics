@@ -1,5 +1,5 @@
-#include "surface.h"
 #include "object.h"
+#include "surface.h"
 #include "ray.h"
 #include <cmath>
 
@@ -18,7 +18,6 @@ Triangle::Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c,
     points.push_back(b);
     points.push_back(c);
 
-    // is this right face?
     vn = glm::normalize(glm::cross(a - b, b - c));
 }
 
@@ -96,6 +95,11 @@ glm::vec3 Triangle::normal(glm::vec3 p) {
     return vn;
 }
 
+glm::vec3 Triangle::get_texture_pixel(glm::vec3 p) {
+    assert(false);
+    return p;
+}
+
 bool Surface::has_intersection(Ray ray) {
     for (unsigned i = 0; i < triangles.size(); i++) {
         if (triangles[i].has_intersection(ray)) {
@@ -170,4 +174,10 @@ glm::vec3 Surface::normal(glm::vec3 point) {
     // this should not be happen
     assert(false);
     return glm::vec3(0);
+}
+
+glm::vec3 Surface::get_texture_pixel(glm::vec3 p) {
+    // never use this
+    assert(false);
+    return p;
 }

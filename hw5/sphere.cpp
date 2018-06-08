@@ -86,5 +86,63 @@ Ray Sphere::refract(Ray ray) {
 }
 
 glm::vec3 Sphere::normal(glm::vec3 point) {
-    return glm::normalize(point - center);
+    if (bump_map == NULL) {
+        return glm::normalize(point - center);
+    }
+
+    glm::vec3 twiddle = get_bump_map_pixel(point) * 2.0f - glm::vec3(1.0f);
+    glm::vec3 z = glm::normalize(point - center);
+    if (glm::length(glm::vec3(0.0f, 1.0f, 0.0f) - z) < EPSILON) {
+        return z;
+    }
+
+    glm::vec3 x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), z));
+    glm::vec3 y = glm::normalize(glm::cross(z, x));
+
+
+    glm::vec3 result = x * twiddle.x + y * twiddle.y + z * twiddle.z;
+
+    return glm::normalize(result);
+}
+
+glm::vec3 Sphere::get_texture_pixel(glm::vec3 p) {
+    if (texture == NULL) {
+        // this should not be happened
+        assert(false);
+    }
+
+    int width = texture->width;
+    int height = texture->height;
+    png_bytep *data = texture->data;
+    
+    glm::vec3 n = glm::normalize(p - center);
+    float pi = std::atan(1) * 4;
+    int u = (int) (((float) width) * (atan2f(n.z, n.x) / (2.0f * pi) + 0.5f));
+    int v = (int) (((float) height) * (0.5f - asinf(n.y) / pi));
+
+    png_bytep row = data[v];
+    png_bytep pixel = &row[u * 4];
+
+    return glm::vec3((float) pixel[0], (float) pixel[1], (float) pixel[2]) / 255.0f;
+}
+
+glm::vec3 Sphere::get_bump_map_pixel(glm::vec3 p) {
+    if (bump_map == NULL) {
+        // this should not be happened
+        assert(false);
+    }
+
+    int width = bump_map->width;
+    int height = bump_map->height;
+    png_bytep *data = bump_map->data;
+    
+    glm::vec3 n = glm::normalize(p - center);
+    float pi = std::atan(1) * 4;
+    int u = (int) (((float) width) * (atan2f(n.z, n.x) / (2.0f * pi) + 0.5f));
+    int v = (int) (((float) height) * (0.5f - asinf(n.y) / pi));
+
+    png_bytep row = data[v];
+    png_bytep pixel = &row[u * 4];
+
+    return glm::vec3((float) pixel[0], (float) pixel[1], (float) pixel[2]) / 255.0f;
 }

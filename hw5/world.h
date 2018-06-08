@@ -28,4 +28,16 @@ class World {
         const glm::vec3 eye = eye_init;
 };
 
+typedef struct thread_data {
+    int id;
+    int start;
+    int end;
+    int width;
+    int height;
+    int out_width;
+    int out_height;
+    glm::vec3 eye;
+    World *world;
+} thread_data_t;
+
 #endif

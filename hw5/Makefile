@@ -1,5 +1,5 @@
 all:
-	g++ -DGLM_FORCE_CTOR_INIT *.cpp -lpng -lGL -lGLU -lglut -o hw5.out
+	g++ -DGLM_FORCE_CTOR_INIT *.cpp -pthread -lpng -lGL -lGLU -lglut -o hw5.out
 
 run: all
 	./hw5.out

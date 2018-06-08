@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include "ray.h"
+#include "image.h"
 
 class Object {
     public:
@@ -17,12 +18,18 @@ class Object {
         virtual bool has_intersection(Ray) = 0;
         virtual glm::vec3 intersect(Ray) = 0;
         virtual glm::vec3 normal(glm::vec3) = 0;
+        virtual glm::vec3 get_texture_pixel(glm::vec3) = 0;
 
-        int gloss;
-        bool is_reflective, is_refractive;
-        float reflect_coeff = 1.0f, refract_coeff = 1.0f;
+        const int gloss;
+        const bool is_reflective, is_refractive;
         const float n;
+
+        float reflect_coeff = 1.0f, refract_coeff = 1.0f;
+
         glm::vec3 ambient, diffuse, specular;
+
+        image_info_t *texture = NULL;
+        image_info_t *bump_map = NULL;
 };
 
 #endif

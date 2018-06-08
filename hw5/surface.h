@@ -18,6 +18,7 @@ class Triangle : Object {
         bool has_intersection(Ray);
         glm::vec3 intersect(Ray);
         glm::vec3 normal(glm::vec3);
+        glm::vec3 get_texture_pixel(glm::vec3);
 
         std::vector<glm::vec3> points;
         glm::vec3 vn;
@@ -30,6 +31,7 @@ class Surface : Object {
         bool has_intersection(Ray);
         glm::vec3 intersect(Ray);
         glm::vec3 normal(glm::vec3);
+        glm::vec3 get_texture_pixel(glm::vec3);
 
         std::vector<Triangle> triangles;
 };
