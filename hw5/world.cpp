@@ -164,8 +164,6 @@ void *thread_func(void *thread_data) {
     glm::vec3 eye = td->eye;
     World *world = td->world;
 
-    printf("%d %d\n", width, height);
-
     const glm::vec3 o(-width / 2.f, height / 2.f, 0.0f);
 
     float width_r = width / (float) out_width;
@@ -182,7 +180,9 @@ void *thread_func(void *thread_data) {
             prev_progress = ((j - start) * out_width + i) * 100 / (out_width * (end - start) - 1);
             if (progress != prev_progress) {
                 progress = prev_progress;
-                printf("Thread %d - %d/100 completed...\n", id, progress);
+                if (progress % 10 == 0) {
+                    printf("Thread %d - %d/100 completed...\n", id, progress);
+                }
             }
             glm::vec3 summed(0.0f);
             for (int dj = -2; dj <= 2; dj++) {
