@@ -12,8 +12,8 @@
 #define CAST(x) ((Object *)(x))
 
 
-static const float view_width = 720.0f, view_height = 400.0f;
-static const int width = 1800 / 3, height = 1000 / 3;
+static const float view_width = 720.0f, view_height = 405.0f;
+static const int width = 3600, height = 2000;
 const glm::vec3 eye_init(0.0f, 0.0f, 300.0f);
 glm::vec3 background(1.0f, 1.0f, 1.0f);
 
@@ -49,7 +49,8 @@ int main() {
     (CAST(&sphere2))->refract_coeff = 0.4f;
 
     for (int i = 0; i < 11; i++) {
-        float yd = abs(5 - i) * 10.0f;
+        // float yd = abs(5 - i) * 10.0f;
+        float yd = (i - 5) * (i - 5) * 3.0f;
         Sphere *ss = new Sphere(
                 glm::vec3(-200.0f + 40 * i, 120.0f - yd, 50.0f), 7.0f,
                 glm::vec3(0.01f, 0.01f, 0.01f),
@@ -121,15 +122,25 @@ int main() {
     (CAST(&floor1))->reflect_coeff = 0.7f;
     (CAST(&floor2))->reflect_coeff = 0.7f;
 
-    Surface surface(
+    Surface surface1(
             glm::vec3(0.1f, 0.18725f, 0.1745f),
             glm::vec3(0.396f, 0.74151f, 0.69102f),
             glm::vec3(0.297254f, 0.30829f, 0.306678f),
             3, 1.0f, true, false);
 
-    load_obj(surface, (char *)"./assets/octahedron.obj");
-    surface.scale(30.0f);
-    surface.translate(glm::vec3(80.0f, -30.0f, 100.0f));
+    load_obj(surface1, (char *)"./assets/octahedron.obj");
+    surface1.scale(30.0f);
+    surface1.translate(glm::vec3(80.0f, -30.0f, 100.0f));
+
+    Surface surface2(
+            glm::vec3(0.0f, 0.1f, 0.0f),
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            3, 1.0f, false, false);
+
+    load_obj(surface2, (char *)"./assets/octahedron.obj");
+    surface2.scale(25.0f);
+    surface2.translate(glm::vec3(10.0f, -30.0f, -20.0f));
 
     world.objects.push_back(CAST(&sphere1));
     world.objects.push_back(CAST(&sphere2));
@@ -139,8 +150,11 @@ int main() {
     world.objects.push_back(CAST(&mirror4));
     world.objects.push_back(CAST(&floor1));
     world.objects.push_back(CAST(&floor2));
-    for (int i = 0; i < (int) surface.triangles.size(); i++) {
-        world.objects.push_back(CAST(&surface.triangles[i]));
+    for (int i = 0; i < (int) surface1.triangles.size(); i++) {
+        world.objects.push_back(CAST(&surface1.triangles[i]));
+    }
+    for (int i = 0; i < (int) surface2.triangles.size(); i++) {
+        world.objects.push_back(CAST(&surface2.triangles[i]));
     }
 
     std::vector<glm::vec3> data;
