@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+    <title>컴퓨터 그래픽스 HW5 레포트</title>
+    <link type="text/css" rel="stylesheet" href="assets/css/github-markdown.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/pilcrow.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/hljs-github.min.css"/>
+  </head>
+  <body>
+    <article class="markdown-body"><h1 id="컴퓨터-그래픽스-hw5-레포트"><a class="header-link" href="#컴퓨터-그래픽스-hw5-레포트"></a>컴퓨터 그래픽스 HW5 레포트</h1>
+<blockquote>
+<p>2016-11076 박재현</p>
+</blockquote>
+<h2 id="환경"><a class="header-link" href="#환경"></a>환경</h2>
+<ul class="list">
+<li>Arch Linux 4.16.13-2-ARCH</li>
+<li>glm 0.9.9.0-1 (libglm-dev on Ubuntu)</li>
+<li>libpng 1.6.34-2</li>
+<li>위의 라이브러리들이 설치된 Ubuntu 16.04 LTS에서 작동을 확인하였습니다.</li>
+</ul>
+<h2 id="이미지-렌더링-하는-방법"><a class="header-link" href="#이미지-렌더링-하는-방법"></a>이미지 렌더링 하는 방법</h2>
+<pre class="hljs"><code>make <span class="hljs-keyword">run</span><span class="bash"></span></code></pre><h2 id="구현-내용"><a class="header-link" href="#구현-내용"></a>구현 내용</h2>
+<ul class="list">
+<li>최종 이미지는 <code>result.png</code>로 보실 수 있습니다.</li>
+<li>여러 개의 Sphere들을 그렸습니다.</li>
+<li>여러 개의 Polygon들을 그렸습니다.</li>
+<li>Recursive reflection, Recursive refraction을 구현했습니다.<ul class="list">
+<li>가운데 있는 구와 위에 나란히 선 작은 구들에서 관찰할 수 있습니다.</li>
+<li>또한 뒤의 벽과 바닥이 거울면이기 때문에 그곳들에서도 recursive reflection을 관찰할 수 있습니다.</li>
+</ul>
+</li>
+<li>Phong illumination을 구현했습니다.<ul class="list">
+<li>각각의 Object들에 ambient, diffuse, specular 값들을 부여하고 그에 맞게 광원에 따라서 색깔을 결정했습니다.</li>
+</ul>
+</li>
+<li>Obj 파일에서 Polygon을 불러오는 것을 구현했습니다.<ul class="list">
+<li>소스는 <code>parse.h</code>, <code>parse.cpp</code>에서 보실 수 있습니다.</li>
+<li>사용한 OBJ 파일은 <code>./assets/octahedron.obj</code>입니다.</li>
+</ul>
+</li>
+<li>Ray tracing한 결과를 png 이미지 형식으로 export하는 기능을 구현했습니다.<ul class="list">
+<li>libpng를 사용해서 각 픽셀들의 값을 저장했습니다.</li>
+</ul>
+</li>
+<li>Texture mapping과 Bump mapping을 구현했습니다.<ul class="list">
+<li>왼쪽의 큰 구에서 Texture mapping과 Bump mapping을 관찰할 수 있습니다.</li>
+<li>사용한 텍스쳐 파일들은 <code>./assets/texture.png</code>, <code>./assets/normals.png</code>입니다.</li>
+</ul>
+</li>
+<li>Distributed Ray Tracing을 구현했습니다.<ul class="list">
+<li>한 픽셀에 기여하는 Ray를 여러 개를 사용해서 렌더링했습니다.</li>
+<li>구현은 <code>world.cpp</code>의 <code>render</code> 함수에서 보실 수 있습니다.</li>
+</ul>
+</li>
+<li>Multi-threading으로 렌더링 속도를 빠르게 했습니다.</li>
+</ul>
+    </article>
+  </body>
+</html>

@@ -8,4 +8,4 @@ clean:
 	rm -f hw5.out result.png
 
 handin:
-	tar czf	hw5.tar.gz *.cpp *.h Makefile report.pdf
+	tar czf	hw5.tar.gz *.cpp *.h Makefile ./assets/* result.png report.pdf
